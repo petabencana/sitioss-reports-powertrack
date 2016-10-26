@@ -123,7 +123,7 @@ PowertrackDataSource.prototype.filter = function(self,tweetActivity) {
 	self.logger.verbose( 'filter: Received tweetActivity: screen_name="' + tweetActivity.actor.preferredUsername + '", text="' + tweetActivity.body.replace("\n", "") + '", coordinates="' + (tweetActivity.geo && tweetActivity.geo.coordinates ? tweetActivity.geo.coordinates[1]+", "+tweetActivity.geo.coordinates[0] : 'N/A') + '"' );
 
 	// Retweet handling
-	if ( tweetActivity.verb === 'share') {
+	/*if ( tweetActivity.verb === 'share') {
 		// Catch tweets from authorised user to verification - handle verification and then continue processing the tweet
 		if ( tweetActivity.actor.preferredUsername === self.config.twitter.usernameVerify ) {
 			self._processVerifiedReport( self._parseRetweetOriginalTweetIdFromActivity(tweetActivity) );
@@ -132,7 +132,7 @@ PowertrackDataSource.prototype.filter = function(self,tweetActivity) {
 			self.logger.debug( "filter: Ignoring retweet from user " + tweetActivity.actor.preferredUsername );
 			return;
 		}
-	}
+	}*/
 
 	// Everything incoming has a keyword already, so we now try and categorize it using the Gnip tags
 	var hasGeo = (tweetActivity.geo && tweetActivity.geo.coordinates);
@@ -160,12 +160,15 @@ PowertrackDataSource.prototype.filter = function(self,tweetActivity) {
 	if ( geoInBoundingBox && addressed ) {
 		self.logger.verbose( 'filter: +BOUNDINGBOX +ADDRESSED = confirmed report' );
 
-		self._insertConfirmed(tweetActivity); //user + geo = confirmed report!
+		//self._insertConfirmed(tweetActivity); //user + geo = confirmed report!
+		bot.parse();
 
 	} else if ( geoInBoundingBox && !addressed ) {
 		self.logger.verbose( 'filter: +BOUNDINGBOX -ADDRESSED = unconfirmed report, ask user to participate' );
 
-		self._insertUnConfirmed(tweetActivity); //insert unconfirmed report
+		//self._insertUnConfirmed(tweetActivity); //insert unconfirmed report
+
+		bot.ahoy();
 
 		// If we haven't contacted the user before, send them an invite tweet
 		self._ifNewUser( tweetActivity.actor.preferredUsername, function(result) {
@@ -181,14 +184,16 @@ PowertrackDataSource.prototype.filter = function(self,tweetActivity) {
 	} else if ( !geoInBoundingBox && !hasGeo && locationMatch && addressed ) {
 		self.logger.verbose( 'filter: -BOUNDINGBOX -GEO +ADDRESSED +LOCATION = ask user for geo' );
 
-		self._insertNonSpatial(tweetActivity); //User sent us a message but no geo, log as such
+		//self._insertNonSpatial(tweetActivity); //User sent us a message but no geo, log as such
+		bot.parse();
 
 		// Ask them to enable geo-location
-		self._sendReplyTweet( tweetActivity, self._getMessage('askforgeo_text', tweetActivity) );
+		//self._sendReplyTweet( tweetActivity, self._getMessage('askforgeo_text', tweetActivity) );
 
 	} else if ( !geoInBoundingBox && !hasGeo && locationMatch && !addressed ) {
 		self.logger.verbose( 'filter: -BOUNDINGBOX -GEO -ADDRESSED +LOCATION = ask user to participate' );
 
+		bot.ahoy();
 		// If we haven't contacted the user before, send them an invite tweet
 		self._ifNewUser( tweetActivity.actor.preferredUsername, function(result) {
 			self._sendReplyTweet(
