@@ -75,7 +75,7 @@ PowertrackDataSource.prototype._storeTweetID = function(tweetActivity,tweetProce
 
  self.reports.dbQuery(
 	 {
-		 text: "UPDATE seen_tweet_id SET id=$1;",
+		 text: "UPDATE twitter.seen_tweet_id SET id=$1;",
 		 values: [self._parseTweetIdFromActivity(tweetActivity)]
 	 },
 	 function(result) {
@@ -97,7 +97,7 @@ PowertrackDataSource.prototype._lastTweetID = function(stream) {
 	var self=this;
 	self.reports.dbQuery(
 		{
-			text: "SELECT id FROM seen_tweet_id;"
+			text: "SELECT id FROM twitter.seen_tweet_id;"
 		},
 		function(result) {
 			self.lastTweetID = Number(result.rows[0].id);
