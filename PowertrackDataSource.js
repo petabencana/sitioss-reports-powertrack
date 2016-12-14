@@ -215,6 +215,21 @@ PowertrackDataSource.prototype.start = function() {
 	// Send a notification on an extended disconnection
 	var disconnectionNotificationSent = false;
 
+	// Function to watch for incoming cards in the database and send replies
+	function confirmReports(){
+		self.bot.confirm(function(err, username, message){
+			self._baseSendReplyTweet(
+				username,
+				null,
+				message,
+				function(){
+					self.logger.debug("Sent received report confirmation message");
+					return;
+				}
+			);
+		})
+	};
+
 	// Attempt to reconnect the socket.
 	// If we fail, wait an increasing amount of time before we try again.
 	function reconnectSocket() {
@@ -349,7 +364,7 @@ PowertrackDataSource.prototype.start = function() {
 			stream.start();
 		})
 	});
-
+	confirmReports();
 };
 
 /**
