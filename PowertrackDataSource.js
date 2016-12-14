@@ -3,6 +3,9 @@
 // Prototype object this object extends from - contains basic twitter interaction functions
 var BaseTwitterDataSource = require('../BaseTwitterDataSource/BaseTwitterDataSource.js');
 
+// Require Bot library
+var Bot = require('../cognicity-grasp/index.js');
+
 /**
  * The Gnip Powertrack data source.
  * Connect to the Gnip Powertrack stream and process matching tweet data.
@@ -20,6 +23,7 @@ var PowertrackDataSource = function PowertrackDataSource(
 
 	// Store references to constructor arguments
 	this.config = config;
+	this.bot = Bot(reports.config, reports.logger, reports.pg);
 
 	BaseTwitterDataSource.call(this, reports, twitter);
 
@@ -50,19 +54,16 @@ PowertrackDataSource.prototype.Gnip =  null;
  */
 PowertrackDataSource.prototype.config = {};
 
-/**
- * Resolve message code from config.twitter using passed language codes.
- * Will fall back to trying to resolve message using default language set in configuration.
- * @param {string} code Message code to lookup in config.twitter
- * @param {GnipTweetActivity} tweetActivity Tweet activity object; check twitter language code and Gnip language codes for a match
- * @returns {?string} Message text, or null if not resolved.
- */
-PowertrackDataSource.prototype._getMessage = function(code, tweetActivity) {
-	var self = this;
+PowertrackDataSource.prototype._checkAgainstLastTweetID = function(tweetActivity, callback){
 
-	return self._baseGetMessage(code, self._parseLangsFromActivity(tweetActivity));
+	var self = this
+
+	var tweet_id = self._parseTweetIdFromActivity(tweetActivity);
+
+	if (tweet_id > self.lastTweetID){
+		callback(tweetActivity)
+	}
 };
-
 
 /**
  * Store the last seen tweet ID and then call the tweet processor.
@@ -70,21 +71,20 @@ PowertrackDataSource.prototype._getMessage = function(code, tweetActivity) {
  @param {function} tweetProcessor function to process the tweet once the ID has been stored
  */
 
-PowertrackDataSource.prototype._storeTweetID = function(tweetActivity,tweetProcessor) {
- var self=this;
+PowertrackDataSource.prototype._storeTweetID = function(tweetActivity, callback) {
+ var self = this;
+
+ var tweet_id = self._parseTweetIdFromActivity(tweetActivity);
 
  self.reports.dbQuery(
 	 {
 		 text: "UPDATE twitter.seen_tweet_id SET id=$1;",
-		 values: [self._parseTweetIdFromActivity(tweetActivity)]
+		 values: [tweet_id]
 	 },
 	 function(result) {
-		 let id = Number(self._parseTweetIdFromActivity(tweetActivity));
-		 if (id > self.lastTweetID) {
-			 tweetProcessor(self,tweetActivity);
-			 self.logger.verbose('Recorded tweet ' + id + ' as having been seen.');
+			 self.logger.verbose('Recorded tweet ' + tweet_id + ' as having been seen.');
+			 callback();
 		 }
-	 }
  );
 };
 
@@ -93,15 +93,15 @@ PowertrackDataSource.prototype._storeTweetID = function(tweetActivity,tweetProce
  @param {function} tweetProcessor function to call once the last seen tweet ID has been loaded.
  */
 
-PowertrackDataSource.prototype._lastTweetID = function(stream) {
-	var self=this;
+PowertrackDataSource.prototype._getlastTweetIDFromDatabase = function(callback) {
+	var self = this;
 	self.reports.dbQuery(
 		{
 			text: "SELECT id FROM twitter.seen_tweet_id;"
 		},
 		function(result) {
 			self.lastTweetID = Number(result.rows[0].id);
-			stream.start();
+			callback();
 		}
 	);
 };
@@ -118,10 +118,11 @@ PowertrackDataSource.prototype._lastTweetID = function(stream) {
  * confirmed report, ask for geo, ask user to participate, or nothing
  * @param {GnipTweetActivity} tweetActivity The tweet activity from Gnip
  */
-PowertrackDataSource.prototype.filter = function(self,tweetActivity) {
-
+PowertrackDataSource.prototype.filter = function(tweetActivity) {
+	var self = this;
 	self.logger.verbose( 'filter: Received tweetActivity: screen_name="' + tweetActivity.actor.preferredUsername + '", text="' + tweetActivity.body.replace("\n", "") + '", coordinates="' + (tweetActivity.geo && tweetActivity.geo.coordinates ? tweetActivity.geo.coordinates[1]+", "+tweetActivity.geo.coordinates[0] : 'N/A') + '"' );
 
+	//TODO Retweet handling. See #3
 	// Retweet handling
 	/*if ( tweetActivity.verb === 'share') {
 		// Catch tweets from authorised user to verification - handle verification and then continue processing the tweet
@@ -134,80 +135,60 @@ PowertrackDataSource.prototype.filter = function(self,tweetActivity) {
 		}
 	}*/
 
+	function botTweet(err, message){
+		if (err){
+			self.logger.error('Error calling bot.parseRequest - no reply sent');
+		}
+		else {
+			self._sendReplyTweet(tweetActivity, message);
+		}
+	}
+
+	function parseRequest(tweetActivity){
+		self.bot.parseRequest(tweetActivity.actor.preferredUsername, tweetActivity.body, self._parseLangsFromActivity(tweetActivity)[0], botTweet);
+	}
+
+	function sendAhoy(tweetActivity){
+		self._ifNewUser(tweetActivity.actor.preferredUsername, function(username_hash){
+			self.bot.ahoy(tweetActivity.actor.preferredUsername, self._parseLangsFromActivity(tweetActivity)[0], botTweet);
+			self._insertInvitee(tweetActivity);
+		});
+		return;
+	}
+
 	// Everything incoming has a keyword already, so we now try and categorize it using the Gnip tags
-	var hasGeo = (tweetActivity.geo && tweetActivity.geo.coordinates);
-	var geoInBoundingBox = false;
+	var jbd = false;
 	var addressed = false;
-	var locationMatch = false;
 
 	tweetActivity.gnip.matching_rules.forEach( function(rule){
 		if (rule.tag) {
-			// Only set geoInBoundingBox to true if the user has tweet coordinates as well as matching the rule,
-			// as the rule can match on 'place' being within the bounding box
-			if (rule.tag.indexOf("boundingbox")===0 && hasGeo) geoInBoundingBox = true;
 			if (rule.tag.indexOf("addressed")===0) addressed = true;
-			if (rule.tag.indexOf("location")===0) locationMatch = true;
+			if (rule.tag.indexOf("jbd")===0) jbd = true;
 		}
 	});
-	var tweetCategorizations = (geoInBoundingBox?'+':'-') + "BOUNDINGBOX " +
-		(hasGeo?'+':'-') + "GEO " +
-		(addressed?'+':'-') + "ADDRESSED " +
-		(locationMatch?'+':'-') + "LOCATION";
-
-	self.logger.verbose("filter: Categorized tweetActivity via Gnip tags as " + tweetCategorizations);
 
 	// Perform the actions for the categorization of the tweet
-	if ( geoInBoundingBox && addressed ) {
-		self.logger.verbose( 'filter: +BOUNDINGBOX +ADDRESSED = confirmed report' );
+	if ( jbd && addressed ) {
 
-		//self._insertConfirmed(tweetActivity); //user + geo = confirmed report!
-		bot.parse();
+		self.logger.verbose("Tweet is addressed and within JBD -> parse by bot");
 
-	} else if ( geoInBoundingBox && !addressed ) {
-		self.logger.verbose( 'filter: +BOUNDINGBOX -ADDRESSED = unconfirmed report, ask user to participate' );
+		parseRequest(tweetActivity);
 
-		//self._insertUnConfirmed(tweetActivity); //insert unconfirmed report
+	} else if ( jbd && !addressed ) {
 
-		bot.ahoy();
+		self.logger.verbose("Tweet is not addressed and within JBD -> send ahoy");
 
-		// If we haven't contacted the user before, send them an invite tweet
-		self._ifNewUser( tweetActivity.actor.preferredUsername, function(result) {
-			self._sendReplyTweet(
-				tweetActivity,
-				self._getMessage('invite_text', tweetActivity),
-				function(){
-					self._insertInvitee(tweetActivity);
-				}
-			);
-		});
+		sendAhoy(tweetActivity);
 
-	} else if ( !geoInBoundingBox && !hasGeo && locationMatch && addressed ) {
-		self.logger.verbose( 'filter: -BOUNDINGBOX -GEO +ADDRESSED +LOCATION = ask user for geo' );
+	} else if ( !jbd && addressed ) {
 
-		//self._insertNonSpatial(tweetActivity); //User sent us a message but no geo, log as such
-		bot.parse();
+		self.logger.verbose("Not in JBD but addressed -> parse by bot");
 
-		// Ask them to enable geo-location
-		//self._sendReplyTweet( tweetActivity, self._getMessage('askforgeo_text', tweetActivity) );
-
-	} else if ( !geoInBoundingBox && !hasGeo && locationMatch && !addressed ) {
-		self.logger.verbose( 'filter: -BOUNDINGBOX -GEO -ADDRESSED +LOCATION = ask user to participate' );
-
-		bot.ahoy();
-		// If we haven't contacted the user before, send them an invite tweet
-		self._ifNewUser( tweetActivity.actor.preferredUsername, function(result) {
-			self._sendReplyTweet(
-				tweetActivity,
-				self._getMessage('invite_text', tweetActivity),
-				function(){
-					self._insertInvitee(tweetActivity);
-				}
-			);
-		});
+		parseRequest(tweetActivity);
 
 	} else {
 		// Not in bounding box but has geocoordinates or no location match
-		self.logger.warn( 'filter: Tweet did not match category actions: ' + tweetCategorizations );
+		self.logger.warn( 'filter: Tweet did not match category actions (not in JBD nor addressed)' );
 	}
 
 };
@@ -220,6 +201,9 @@ PowertrackDataSource.prototype.filter = function(self,tweetActivity) {
  */
 PowertrackDataSource.prototype.start = function() {
 	var self = this;
+
+	// 1. Get last seen tweet from the database, store locally on startup.
+	// 2. For every tweet store in database even if doesn't pass filter.
 
 	// Gnip stream
 	var stream;
@@ -252,6 +236,7 @@ PowertrackDataSource.prototype.start = function() {
 			if (streamReconnectTimeout >= self.config.gnip.maxReconnectTimeout) streamReconnectTimeout = self.config.gnip.maxReconnectTimeout;
 		}
 
+		// TODO - check reconnect with new ID storage
 		// Attempt to reconnect
 		self.logger.info( 'connectStream: Attempting to reconnect stream' );
 		stream.start();
@@ -293,6 +278,7 @@ PowertrackDataSource.prototype.start = function() {
 
 	// When we receive a tweetActivity from the Gnip stream this event handler will be called
 	stream.on('tweet', function(tweetActivity) {
+		// TODO - validate cache mode with new tweet id storage
 		if (self._cacheMode) {
 			self.logger.debug( "connectStream: caching incoming tweet for later processing (id=" + tweetActivity.id + ")" );
 			self._cachedData.push( tweetActivity );
@@ -302,8 +288,12 @@ PowertrackDataSource.prototype.start = function() {
 			// Catch errors here, otherwise error in filter method is caught as stream error
 			try {
 				if (tweetActivity.actor) {
-					// This looks like a tweet in Gnip activity format
-					self._storeTweetID(tweetActivity,self.filter);
+					// This looks like a tweet in Gnip activity format, store ID, then check for filter
+					self._storeTweetID(tweetActivity, function(){
+						self._checkAgainstLastTweetID(tweetActivity, function(tweetActivity){
+							self.filter(tweetActivity);
+						})
+					});
 				} else {
 					// This looks like a system message
 					self.logger.info("connectStream: Received system message: " + JSON.stringify(tweetActivity));
@@ -353,33 +343,13 @@ PowertrackDataSource.prototype.start = function() {
 	rules.live.update(newRules, function(err) {
 	    if (err) throw err;
 		self.logger.info('connectStream: Connecting stream...');
-		// If we pushed the rules successfully, now try and connect the stream
-		self._lastTweetID(stream);
+
+		// If we pushed the rules successfully, get last seen report, and then try and connect the stream
+		self._getlastTweetIDFromDatabase(function(){
+			stream.start();
+		})
 	});
 
-};
-
-/**
- * Insert a confirmed report - i.e. has geo coordinates and is addressed.
- * Store both the tweet information and the user hash.
- * @param {GnipTweetActivity} tweetActivity Gnip PowerTrack tweet activity object
- */
-PowertrackDataSource.prototype._insertConfirmed = function(tweetActivity) {
-	var self = this;
-
-	self._baseInsertConfirmed(
-		tweetActivity.actor.preferredUsername,
-		self._parseLangsFromActivity(tweetActivity),
-		self._parseTweetIdFromActivity(tweetActivity),
-		tweetActivity.postedTime,
-		tweetActivity.body,
-		JSON.stringify(tweetActivity.twitter_entities.hashtags),
-		JSON.stringify(tweetActivity.twitter_entities.urls),
-		JSON.stringify(tweetActivity.twitter_entities.user_mentions),
-		tweetActivity.twitter_lang,
-		tweetActivity.link,
-		tweetActivity.geo.coordinates[1] + " " + tweetActivity.geo.coordinates[0]
-	);
 };
 
 /**
@@ -391,38 +361,6 @@ PowertrackDataSource.prototype._insertInvitee = function(tweetActivity) {
 
 	self._baseInsertInvitee(tweetActivity.actor.preferredUsername);
 };
-
-/**
- * Insert an unconfirmed report - i.e. has geo coordinates but is not addressed.
- * @param {GnipTweetActivity} tweetActivity Gnip PowerTrack tweet activity object
- */
-PowertrackDataSource.prototype._insertUnConfirmed = function(tweetActivity) {
-	var self = this;
-
-	self._baseInsertUnConfirmed(
-	    tweetActivity.postedTime,
-	    tweetActivity.geo.coordinates[1] + " " + tweetActivity.geo.coordinates[0]
-	);
-};
-
-/**
- * Insert a non-spatial tweet report - i.e. we got an addressed tweet without geo coordinates.
- * @param {GnipTweetActivity} tweetActivity Gnip PowerTrack tweet activity object
- */
-PowertrackDataSource.prototype._insertNonSpatial = function(tweetActivity) {
-	var self = this;
-
-	self._baseInsertNonSpatial(
-		tweetActivity.actor.preferredUsername,
-		tweetActivity.postedTime,
-		tweetActivity.body,
-		JSON.stringify(tweetActivity.twitter_entities.hashtags),
-		JSON.stringify(tweetActivity.twitter_entities.urls),
-		JSON.stringify(tweetActivity.twitter_entities.user_mentions),
-		tweetActivity.twitter_lang
-	);
-};
-
 
 /**
  * Send @reply Twitter message

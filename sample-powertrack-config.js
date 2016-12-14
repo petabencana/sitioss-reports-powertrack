@@ -28,15 +28,6 @@
  * @property {boolen} twitter.send_enabled If true, send tweets to users asking them to verify their reports
  * @property {number} twitter.url_length Length that URLs in tweets are shortened to
  * @property {string} twitter.defaultLanguage The default language code to use if we can't resolve one from the tweet
- * @property {object} twitter.invite_text Object of twitter message texts mapping a language code to a message
- * @property {string} twitter.invite_text.(name) Language code to resolve
- * @property {string} twitter.invite_text.(value) Message to be tweeted
- * @property {object} twitter.askforgeo_text Object of twitter message texts mapping a language code to a message
- * @property {string} twitter.askforgeo_text.(name) Language code to resolve
- * @property {string} twitter.askforgeo_text.(value) Message to be tweeted
- * @property {object} twitter.thanks_text Object of twitter message texts mapping a language code to a message
- * @property {string} twitter.thanks_text.(name) Language code to resolve
- * @property {string} twitter.thanks_text.(value) Message to be tweeted
  * @property {boolean} twitter.addTimestamp If true, append a timestamp to each sent tweet
  */
 var config = {};
@@ -55,15 +46,17 @@ config.gnip.streamUrl = 'https://gnip-stream.twitter.com/stream/powertrack/accou
 config.gnip.rulesUrl = 'https://gnip-api.twitter.com/rules/powertrack/accounts/ACCOUNT_NAME/publishers/twitter/STREAM_LABEL.json'; // Gnip rules URL, take from the Gnip admin interface.
 // Gnip rules, enter as an object where the key is the rule name and the value is the rule as a string
 config.gnip.rules = {
-    "boundingbox":"( contains:flood OR contains:banjir OR contains:jakartabanjir ) ( bounding_box:[106.5894 -6.4354 106.799999999 -6.2] OR bounding_box:[106.8 -6.4354 107.0782 -6.2] OR bounding_box:[106.5894 -6.199999999 106.799999999 -5.9029] OR bounding_box:[106.8 -6.199999999 107.0782 -5.9029] )",
-    "addressed":"( contains:flood OR contains:banjir OR contains:jakartabanjir ) @petajkt",
-    "location":"( contains:flood OR contains:banjir OR contains:jakartabanjir ) ( bio_location:jakarta OR place:jakarta OR profile_bounding_box:[106.5894 -6.4354 106.799999999 -6.2] OR profile_bounding_box:[106.8 -6.4354 107.0782 -6.2] OR profile_bounding_box:[106.5894 -6.199999999 106.799999999 -5.9029] OR profile_bounding_box:[106.8 -6.199999999 107.0782 -5.9029] )"
-};
+    "jbd":"( contains:flood OR contains:banjir OR contains:jakartabanjir ) ( bounding_box:[106.5894 -6.4354 106.799999999 -6.2] OR bounding_box:[106.8 -6.4354 107.0782 -6.2] OR bounding_box:[106.5894 -6.199999999 106.799999999 -5.9029] OR bounding_box:[106.8 -6.199999999 107.0782 -5.9029] OR bio_location:jakarta OR place:jakarta OR profile_bounding_box:[106.5894 -6.4354 106.799999999 -6.2] OR profile_bounding_box:[106.8 -6.4354 107.0782 -6.2] OR profile_bounding_box:[106.5894 -6.199999999 106.799999999 -5.9029] OR profile_bounding_box:[106.8 -6.199999999 107.0782 -5.9029] )",
+
+    "addressed":"( contains:flood OR contains:banjir OR contains:jakartabanjir OR contains:report OR contains:card ) @petabencana",
+  };
+
 config.gnip.maxReconnectTimeout = 1000 * 60 * 5; // In milliseconds; 5 minutes for max reconnection timeout - will mean ~10 minutes from first disconnection
 config.gnip.backfillMinutes = 5; // backfill in minutes on reconnect to the stream
 
 // Twitter app authentication details
 config.twitter = {};
+//TODO grasp & re-tweet verification see #3
 config.twitter.usernameVerify = ''; // Twitter username (without @) authorised to verify reports via retweet functionality
 config.twitter.usernameReplyBlacklist = ''; // Twitter usernames (without @, comma separated for multiples) which will never be sent to in response to tweet processing
 config.twitter.consumer_key = ''; // Take from the twitter dev admin interface
@@ -79,24 +72,7 @@ config.twitter.url_length = 0; // URLs no longer count as part of tweet limits s
 // Note we use IN and ID because twitter and Gnip return different language codes for Indonesian
 // The messages should be no longer than 109 characters if timestamps are enabled, or 123 characters if timestamps are disabled
 config.twitter.defaultLanguage = 'en'; // The default language code to use if we can't resolve one from the tweet
-// Message codes. The name of the object (config.twitter.foo) is the name of the message type, that object should contain key value pairs
-// where the key is the language code to resolve and the value is the message as a string.
-// Note we have both ID and IN for indonesian
-config.twitter.invite_text = {
-	'in' : 'Invite/Verification Tweet Text [IN]',
-	'id' : 'Invite/Verification Tweet Text [ID]',
-	'en' : 'Invite/Verification Tweet Text [EN]'
-};
-config.twitter.askforgeo_text = {
-	'in' : 'Location-enabled reminder Tweet Text [IN]',
-	'id' : 'Location-enabled reminder Tweet Text [ID]',
-	'en' : 'Location-enabled reminder Tweet Text [EN]'
-};
-config.twitter.thanks_text = {
-	'in' : 'Thank-you Tweet Text [IN]',
-	'id' : 'Thank-you Tweet Text [ID]',
-	'en' : 'Thank-you Tweet Text [EN]'
-};
+
 // Append a timestamp to each sent tweet except response to confirmed reports with unique urls
 config.twitter.addTimestamp = true;
 
