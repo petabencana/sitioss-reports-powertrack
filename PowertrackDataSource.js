@@ -54,21 +54,27 @@ PowertrackDataSource.prototype.Gnip =  null;
  */
 PowertrackDataSource.prototype.config = {};
 
+/**
+ * Check new tweet ID is greater than the current one
+ @param {GnipTweetActivity} tweetActivity Tweet activity object (i.e. new tweet)
+ @param {function} callback Function to call if test successful
+ */
+
 PowertrackDataSource.prototype._checkAgainstLastTweetID = function(tweetActivity, callback){
 
-	var self = this
+	var self = this;
 
 	var tweet_id = self._parseTweetIdFromActivity(tweetActivity);
 
 	if (tweet_id > self.lastTweetID){
-		callback(tweetActivity)
+		callback(tweetActivity);
 	}
 };
 
 /**
  * Store the last seen tweet ID and then call the tweet processor.
  @param {GnipTweetActivity} tweetActivity Tweet activity object
- @param {function} tweetProcessor function to process the tweet once the ID has been stored
+ @param {function} callback function to call once the last tweet once the ID has been stored
  */
 
 PowertrackDataSource.prototype._storeTweetID = function(tweetActivity, callback) {
@@ -90,7 +96,7 @@ PowertrackDataSource.prototype._storeTweetID = function(tweetActivity, callback)
 
 /**
  * Retrieve and set the last seen tweetID
- @param {function} tweetProcessor function to call once the last seen tweet ID has been loaded.
+ @param {function} callback function to call once the last seen tweet ID has been loaded.
  */
 
 PowertrackDataSource.prototype._getlastTweetIDFromDatabase = function(callback) {
@@ -227,8 +233,8 @@ PowertrackDataSource.prototype.start = function() {
 					return;
 				}
 			);
-		})
-	};
+		});
+	}
 
 	// Attempt to reconnect the socket.
 	// If we fail, wait an increasing amount of time before we try again.
@@ -251,10 +257,11 @@ PowertrackDataSource.prototype.start = function() {
 			if (streamReconnectTimeout >= self.config.gnip.maxReconnectTimeout) streamReconnectTimeout = self.config.gnip.maxReconnectTimeout;
 		}
 
-		// TODO - check reconnect with new ID storage
 		// Attempt to reconnect
 		self.logger.info( 'connectStream: Attempting to reconnect stream' );
-		stream.start();
+		self._getlastTweetIDFromDatabase(function(){
+			stream.start();
+		});
 	}
 
 	// TODO We get called twice for disconnect, once from error once from end
@@ -307,7 +314,7 @@ PowertrackDataSource.prototype.start = function() {
 					self._storeTweetID(tweetActivity, function(){
 						self._checkAgainstLastTweetID(tweetActivity, function(tweetActivity){
 							self.filter(tweetActivity);
-						})
+						});
 					});
 				} else {
 					// This looks like a system message
@@ -362,7 +369,7 @@ PowertrackDataSource.prototype.start = function() {
 		// If we pushed the rules successfully, get last seen report, and then try and connect the stream
 		self._getlastTweetIDFromDatabase(function(){
 			stream.start();
-		})
+		});
 	});
 	confirmReports();
 };
