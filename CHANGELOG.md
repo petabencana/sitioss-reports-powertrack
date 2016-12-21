@@ -24,3 +24,6 @@ CogniCity
 ### 1.0.4 - 08/10/2015
 * Removed node-daemonize2 support
 * Improved config file for PM2 support
+
+### v3.0.0 - 21/12/2016
+* Re-factored PowerTrack module to use GRASP to control user response
