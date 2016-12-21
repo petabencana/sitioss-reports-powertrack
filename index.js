@@ -10,7 +10,7 @@
  */
 
 var PowertrackDataSource = require('./PowertrackDataSource');
-var config = require('./local-powertrack-config');
+var config = require('./live-grasp-powertrack-config');
 
 // ntwitter twitter interface module
 var Twitter = require('ntwitter');
