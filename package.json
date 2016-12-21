@@ -21,7 +21,7 @@
     "node": "^4.2.1"
   },
   "scripts": {
-    "test": "npm run jshint && npm run mocha",
+    "test": "npm run jshint",
     "jshint": "jshint index.js PowertrackDataSource.js sample-powertrack-config.js test/testPowertrackDataSource.js twitter-send-test/twitter-send-test.js twitter-reply-test/twitter-reply-test.js",
     "mocha": "mocha test",
     "build-docs": "jsdoc -d docs package.json index.js sample-powertrack-config.js PowertrackDataSource.js ../BaseTwitterDataSource/BaseTwitterDataSource.js",

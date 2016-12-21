@@ -5,12 +5,12 @@
  * @copyright (c) Tomas Holderness & SMART Infrastructure Facility January 2014
  * @license Released under GNU GPLv3 License (see LICENSE.txt).
  * @example
- * Must be run as a subfolder of cognicity-reports, and 
+ * Must be run as a subfolder of cognicity-reports, and
  * cognicity-reports must be configured to use this datasource.
  */
 
 var PowertrackDataSource = require('./PowertrackDataSource');
-var config = require('./sample-powertrack-config');
+var config = require('./live-grasp-powertrack-config');
 
 // ntwitter twitter interface module
 var Twitter = require('ntwitter');
@@ -27,7 +27,7 @@ var constructor = function( reports ) {
 		access_token_key: config.twitter.access_token_key,
 		access_token_secret: config.twitter.access_token_secret
 	});
-	
+
 	return new PowertrackDataSource( reports, twitter, config );
 };
 
