@@ -146,7 +146,16 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 			self.logger.error('Error calling bot.parseRequest - no reply sent');
 		}
 		else {
-			self._sendReplyTweet(tweetActivity, message);
+			self._sendReplyTweet(tweetActivity, message, null);
+		}
+	}
+
+	function botTweetWithMedia(err, message){
+		if (err){
+			self.logger.error('Error calling bot.parseRequest - no reply sent');
+		}
+		else {
+			self._sendReplyTweet(tweetActivity, self.config.twitter.media_id, message, null);
 		}
 	}
 
@@ -156,7 +165,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 
 	function sendAhoy(tweetActivity){
 		self._ifNewUser(tweetActivity.actor.preferredUsername, function(username_hash){
-			self.bot.ahoy(tweetActivity.actor.preferredUsername, self._parseLangsFromActivity(tweetActivity)[0], botTweet);
+			self.bot.ahoy(tweetActivity.actor.preferredUsername, self._parseLangsFromActivity(tweetActivity)[0], botTweetWithMedia);
 			self._insertInvitee(tweetActivity);
 		});
 		return;
@@ -226,6 +235,7 @@ PowertrackDataSource.prototype.start = function() {
 		self.bot.confirm(function(err, username, message){
 			self._baseSendReplyTweet(
 				username,
+				null,
 				null,
 				message,
 				function(){
@@ -390,12 +400,13 @@ PowertrackDataSource.prototype._insertInvitee = function(tweetActivity) {
  * @param {string} message The tweet text to send
  * @param {function} success Callback function called on success
  */
-PowertrackDataSource.prototype._sendReplyTweet = function(tweetActivity, message, success) {
+PowertrackDataSource.prototype._sendReplyTweet = function(tweetActivity, media_id, message, success) {
 	var self = this;
 
 	self._baseSendReplyTweet(
 		tweetActivity.actor.preferredUsername,
 		self._parseTweetIdFromActivity(tweetActivity),
+		media_id,
 		message,
 		success
 	);
