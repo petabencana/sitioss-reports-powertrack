@@ -155,7 +155,16 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 			self.logger.error('Error calling bot.parseRequest - no reply sent');
 		}
 		else {
-			self._sendReplyTweet(tweetActivity, message, self.config.twitter.media_id, null);
+			// Set default media link
+			var media = self.config.twitter.media_id.id;
+			// Get language of user's tweet
+			var lang = self._parseLangsFromActivity(tweetActivity)[0];
+			// Switch media to English if required
+			if (lang === 'en'){
+				media = self.config.twitter.media_id.en;
+			}
+			// Send tweet
+			self._sendReplyTweet(tweetActivity, message, media, null);
 		}
 	}
 

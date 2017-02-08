@@ -29,6 +29,7 @@
  * @property {number} twitter.url_length Length that URLs in tweets are shortened to
  * @property {string} twitter.defaultLanguage The default language code to use if we can't resolve one from the tweet
  * @property {boolean} twitter.addTimestamp If true, append a timestamp to each sent tweet
+ * @property {object} twitter.media_id Media to be included with auto-reply tweets
  */
 var config = {};
 
@@ -75,6 +76,12 @@ config.twitter.defaultLanguage = 'en'; // The default language code to use if we
 
 // Append a timestamp to each sent tweet except response to confirmed reports with unique urls
 config.twitter.addTimestamp = true;
+
+// Add a specified twitter media to replies
+config.twitter.media_id = {};
+// See note above - GNIP uses 'in' to represent the Indonesian language.
+config.twitter.media_id.id = '';
+config.twitter.media_id.en = '';
 
 // Export config object
 module.exports = config;
