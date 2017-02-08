@@ -146,11 +146,12 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 			self.logger.error('Error calling bot.parseRequest - no reply sent');
 		}
 		else {
-			self._sendReplyTweet(tweetActivity, message, null, null);
+			// tweetActivity, null media, message, null callback
+			self._sendReplyTweet(tweetActivity, null, message, null);
 		}
 	}
 
-	function botTweetWithMedia(err, message, media_id) {
+	function botTweetWithMedia(err, message) {
 		if (err) {
 			self.logger.error('Error calling bot.parseRequest - no reply sent');
 		}
@@ -164,7 +165,8 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 				media = self.config.twitter.media_id.en;
 			}
 			// Send tweet
-			self._sendReplyTweet(tweetActivity, message, media, null);
+			// tweetActivity, media, message, null callback
+			self._sendReplyTweet(tweetActivity, media, message, null);
 		}
 	}
 
@@ -406,6 +408,7 @@ PowertrackDataSource.prototype._insertInvitee = function(tweetActivity) {
 /**
  * Send @reply Twitter message
  * @param {GnipTweetActivity} tweetActivity The Gnip tweet activity object this is a reply to
+ * @param {string} media_id The media_id of twitter media to embedd in tweet
  * @param {string} message The tweet text to send
  * @param {function} success Callback function called on success
  */
