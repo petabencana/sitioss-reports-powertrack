@@ -141,21 +141,21 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 		}
 	}*/
 
-	function botTweet(err, message){
+	function botTweet(err, message) {
 		if (err){
 			self.logger.error('Error calling bot.parseRequest - no reply sent');
 		}
 		else {
-			self._sendReplyTweet(tweetActivity, message, null);
+			self._sendReplyTweet(tweetActivity, message, null, null);
 		}
 	}
 
-	function botTweetWithMedia(err, message){
-		if (err){
+	function botTweetWithMedia(err, message, media_id) {
+		if (err) {
 			self.logger.error('Error calling bot.parseRequest - no reply sent');
 		}
 		else {
-			self._sendReplyTweet(tweetActivity, self.config.twitter.media_id, message, null);
+			self._sendReplyTweet(tweetActivity, message, self.config.twitter.media_id, null);
 		}
 	}
 
