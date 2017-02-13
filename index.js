@@ -1,5 +1,4 @@
 'use strict';
-require('dotenv').config();
 
 /**
  * @file Cognicity reports data module which retrieves tweet data from Gnip Powertrack
@@ -23,10 +22,10 @@ var Twitter = require('ntwitter');
 var constructor = function( reports ) {
 	// Configure new instance of the ntwitter interface
 	var twitter = new Twitter({
-		consumer_key: process.env.CONSUMER_KEY,
-		consumer_secret: process.env.CONSUMER_SECRET,
-		access_token_key: process.env.ACCESS_TOKEN_KEY,
-		access_token_secret: process.env.ACCESS_TOKEN_SECRET
+		consumer_key: config.twitter.consumer_key,
+		consumer_secret: config.twitter.consumer_secret,
+		access_token_key: config.twitter.access_token_key,
+		access_token_secret: config.twitter.access_token_secret
 	});
 
 	return new PowertrackDataSource( reports, twitter, config );
