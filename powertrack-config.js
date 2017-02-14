@@ -77,7 +77,7 @@ config.twitter.url_length = 0; // URLs no longer count as part of tweet limits s
 config.twitter.defaultLanguage = 'id'; // The default language code to use if we can't resolve one from the tweet
 
 // Append a timestamp to each sent tweet except response to confirmed reports with unique urls
-config.twitter.addTimestamp = true;
+config.twitter.addTimestamp = false;
 
 // Add a specified twitter media to replies
 config.twitter.media_id = {};
