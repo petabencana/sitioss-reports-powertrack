@@ -61,7 +61,7 @@ config.gnip.backfillMinutes = 5; // backfill in minutes on reconnect to the stre
 config.twitter = {};
 //TODO grasp & re-tweet verification see #3
 config.twitter.usernameVerify = ''; // Twitter username (without @) authorised to verify reports via retweet functionality
-config.twitter.usernameReplyBlacklist = ''; // Twitter usernames (without @, comma separated for multiples) which will never be sent to in response to tweet processing
+config.twitter.usernameReplyBlacklist = 'petabencana'; // Twitter usernames (without @, comma separated for multiples) which will never be sent to in response to tweet processing
 config.twitter.consumer_key = process.env.TWITTER_CONSUMER_KEY; // Take from the twitter dev admin interface
 config.twitter.consumer_secret = process.env.TWITTER_CONSUMER_SECRET; // Take from the twitter dev admin interface
 config.twitter.access_token_key = process.env.TWITTER_ACCESS_TOKEN_KEY; // Take from the twitter dev admin interface
