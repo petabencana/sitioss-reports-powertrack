@@ -139,7 +139,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 		self.logger.debug( "filter: Ignoring retweet from user " + tweetActivity.actor.preferredUsername );
 		return;
 	//	}
-	}*/
+	}
 
 	function botTweet(err, message) {
 		if (err){
