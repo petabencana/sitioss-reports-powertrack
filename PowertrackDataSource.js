@@ -130,15 +130,15 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 
 	//TODO Retweet handling. See #3
 	// Retweet handling
-	/*if ( tweetActivity.verb === 'share') {
-		// Catch tweets from authorised user to verification - handle verification and then continue processing the tweet
-		if ( tweetActivity.actor.preferredUsername === self.config.twitter.usernameVerify ) {
-			self._processVerifiedReport( self._parseRetweetOriginalTweetIdFromActivity(tweetActivity) );
-		} else {
+	if ( tweetActivity.verb === 'share') {
+		//Catch tweets from authorised user to verification - handle verification and then continue processing the tweet
+//		if ( tweetActivity.actor.preferredUsername === self.config.twitter.usernameVerify ) {
+//			self._processVerifiedReport( self._parseRetweetOriginalTweetIdFromActivity(tweetActivity) );
+//		} else {
 			// If this was a retweet but not from our verification user, ignore it and do no further processing
-			self.logger.debug( "filter: Ignoring retweet from user " + tweetActivity.actor.preferredUsername );
-			return;
-		}
+		self.logger.debug( "filter: Ignoring retweet from user " + tweetActivity.actor.preferredUsername );
+		return;
+	//	}
 	}*/
 
 	function botTweet(err, message) {
