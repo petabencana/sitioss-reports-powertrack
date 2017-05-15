@@ -48,11 +48,10 @@ config.gnip.streamUrl = process.env.GNIP_STREAM_URL; // Gnip stream URL, take fr
 config.gnip.rulesUrl = process.env.GNIP_RULES_URL; // Gnip rules URL, take from the Gnip admin interface.
 // Gnip rules, enter as an object where the key is the rule name and the value is the rule as a string
 config.gnip.rules = {
-"addressed": "( contains:flood OR contains:banjir ) @petabencana OR ( contains:flood OR contains:banjir ) @petajkt",
-    "jbd":"( contains:flood OR contains:banjir ) ( bounding_box:[106.471 -6.19140 106.79381 -5.880] OR bounding_box:[106.79381 -6.19140 107.10880 -5.880] OR bounding_box:[107.10880 -6.19140 107.175 -5.880] OR bounding_box:[106.471 -6.50213 106.79381 -6.19140] OR bounding_box:[106.79381 -6.50213 107.10880 -6.19140] OR bounding_box:[107.10880 -6.50213 107.175 -6.19140] OR bounding_box:[106.471 -6.733 106.79381 -6.50213] OR bounding_box:[106.79381 -6.733 107.10880 -6.50213] OR bounding_box:[107.10880 -6.733 107.175 -6.50213] OR bio_location:jakarta OR place:jakarta)",
-    "bdg":"( contains:flood OR contains:banjir ) ( bounding_box:[107.369 -6.97964 107.68291 -6.668] OR bounding_box:[107.68921 -6.97964 107.931 -6.668] OR bounding_box:[107.369 -7.165 107.68921 -6.97964] OR bounding_box:[107.68291 -7.165 107.931 -6.97962] OR bio_location:bandung OR place:bandung)",
-    "sby":"( contains:flood OR contains:banjir ) ( bounding_box:[112.3975 -7.32570 112.71169 -7.0143] OR bounding_box:[112.71169 -7.32570 113.0318 -7.0143] OR bounding_box:[112.3975 -7.5499 112.71169 -7.32570] OR bounding_box:[112.71169 -7.5499 113.0318 -7.32570] OR bio_location:surabaya OR place:surabaya)"
-  };
+    "boundingbox":"(contains:flood OR contains:rains) (bounding_box:[80.0900 12.8400 80.3800 13.0517] OR bounding_box:[80.0900 13.0517 80.3800 13.2555])",
+    "addressed":"(contains:flood OR contains:rains) @riskmapindia",
+    "location":"(contains:flood OR contains:rains) (bio_location:chennai OR place:chennai OR bounding_box:[80.0900 12.8400 80.3800 13.0517] OR bounding_box:[80.0900 13.0517 80.3800 13.2555])"
+};
 
 config.gnip.maxReconnectTimeout = 1000 * 60 * 5; // In milliseconds; 5 minutes for max reconnection timeout - will mean ~10 minutes from first disconnection
 config.gnip.backfillMinutes = 5; // backfill in minutes on reconnect to the stream
@@ -74,7 +73,7 @@ config.twitter.url_length = 0; // URLs no longer count as part of tweet limits s
 // Twitter message texts
 // Note we use IN and ID because twitter and Gnip return different language codes for Indonesian
 // The messages should be no longer than 109 characters if timestamps are enabled, or 123 characters if timestamps are disabled
-config.twitter.defaultLanguage = 'id'; // The default language code to use if we can't resolve one from the tweet
+config.twitter.defaultLanguage = 'en'; // The default language code to use if we can't resolve one from the tweet
 
 // Append a timestamp to each sent tweet except response to confirmed reports with unique urls
 config.twitter.addTimestamp = false;
@@ -84,6 +83,13 @@ config.twitter.media_id = {};
 // See note above - GNIP uses 'in' to represent the Indonesian language.
 config.twitter.media_id.id = process.env.TWITTER_MEDIA_ID_ID;
 config.twitter.media_id.en = process.env.TWITTER_MEDIA_ID_EN;
+
+// Cognicity details
+config.cognicity = {};
+config.cognicity.server = process.env.COGNICITY_SERVER;
+config.cognicity.card_url_prefix = process.env.CARDS_PREFIX;
+config.cognicity.network = 'twitter';
+config.cognicity.x_api_key = process.env.X_API_KEY;
 
 // Export config object
 module.exports = config;
