@@ -19,20 +19,6 @@ const options = {
 // Prototype object this object extends from - contains basic twitter interaction functions
 var BaseTwitterDataSource = require('../BaseTwitterDataSource/BaseTwitterDataSource.js');
 
-// Information to be tweeted to the user
-const dialogue = {
-  ahoy: {
-    en: "Hello, I am RiskMapBot, reply with #flood to send me your flood report.",
-    id: "Halo, saya RiskMapBot. Untuk melaporkan banjir di sekitarmu, silakan balas dengan #banjir."
-  },
-  requests: {
-    card : {
-      en: 'Hi! Report flood using this link. Thanks!',
-      id: 'Hai! Gunakan link ini untuk menginput lokasi banjir, keterangan, & foto.'
-    }
-  }
-};
-
 /**
  * The Gnip Powertrack data source.
  * Connect to the Gnip Powertrack stream and process matching tweet data.
@@ -505,7 +491,7 @@ PowertrackDataSource.prototype._getDialogue = function(dialogue, language){
 
 PowertrackDataSource.prototype._ahoy = function(username, language, callback){
 	var self = this;
-	callback(null, self._getDialogue(dialogue.ahoy, language));
+	callback(null, self._getDialogue(self.config.twitter.dialogue.ahoy, language));
 };
 
 PowertrackDataSource.prototype._getCardLink = function(username, network, language, callback) {
@@ -529,7 +515,7 @@ PowertrackDataSource.prototype._getCardLink = function(username, network, langua
       self.logger.info('Fetched card id: ' + body.cardId);
       // Construct the card link to be sent to the user
       var cardLink = self.config.cognicity.card_url_prefix + body.cardId + '/location';
-			var messageText =  self._getDialogue(dialogue.requests.card, language) + ' ' + cardLink;
+			var messageText =  self._getDialogue(self.config.twitter.dialogue.requests.card, language) + ' ' + cardLink;
 			callback(null, messageText);
     } else {
 			var err = 'Error getting card: ' + JSON.stringify(error) + JSON.stringify(response);

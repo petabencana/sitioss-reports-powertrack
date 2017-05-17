@@ -73,7 +73,26 @@ config.twitter.url_length = 0; // URLs no longer count as part of tweet limits s
 // Twitter message texts
 // Note we use IN and ID because twitter and Gnip return different language codes for Indonesian
 // The messages should be no longer than 109 characters if timestamps are enabled, or 123 characters if timestamps are disabled
+// TODO - ADD SUPPORT FOR PREP CARD.
 config.twitter.defaultLanguage = 'en'; // The default language code to use if we can't resolve one from the tweet
+// Dialogue containers
+config.twitter.dialogue = {};
+config.twitter.dialogue.ahoy = {};          // Greet users
+config.twitter.dialogue.requests = {};      // Respond to user requests
+config.twitter.dialogue.requests.card = {}  // Flood report card responses
+// Dialogue translations
+config.twitter.dialogue.ahoy.en = 'Hello, I am RiskMapBot, reply with #flood to send me your flood report.'
+config.twitter.dialogue.ahoy.id =  'Halo, saya RiskMapBot. Untuk melaporkan banjir di sekitarmu, silakan balas dengan #banjir.'
+config.twitter.dialogue.ahoy.in = 'Hello, I am RiskMapBot, reply with #flood to send me your flood report.'
+// Respond to user requests
+config.twitter.dialogue.requests = {};
+config.twitter.dialogue.requests.card.en = 'Hi! Report flood using this link. Thanks!';
+config.twitter.dialogue.requests.card.id = 'Hai! Gunakan link ini untuk menginput lokasi banjir, keterangan, & foto.';
+config.twitter.dialogue.requests.card.in = 'Hi! Report flood using this link. Thanks!';
+
+
+
+
 
 // Append a timestamp to each sent tweet except response to confirmed reports with unique urls
 config.twitter.addTimestamp = false;
