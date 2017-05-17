@@ -38,7 +38,7 @@ npm install
 To build on Windows we recommend installing all dependencies and running `npm install`.
 
 ### Configuration
-App configuration parameters are stored in a configuration file which is parsed by PowertrackDataSource.js. See sample-powertrack-config.js for an example configuration.
+App configuration parameters are stored in a configuration file which is parsed by PowertrackDataSource.js. See powertrack-config.js for configuration. For deployment .env files are used to specify default configuration parameters, which are read by the powertrack-config.js file. Currently, these parameters are stored in a global .env file which is loaded by the parent module cognicity-reports.
 
 #### Gnip parameters
 * stream [true | false] - set to true to connect to Gnip stream.
