@@ -128,20 +128,6 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	var self = this;
 	self.logger.verbose( 'filter: Received tweetActivity: screen_name="' + tweetActivity.actor.preferredUsername + '", text="' + tweetActivity.body.replace("\n", "") + '", coordinates="' + (tweetActivity.geo && tweetActivity.geo.coordinates ? tweetActivity.geo.coordinates[1]+", "+tweetActivity.geo.coordinates[0] : 'N/A') + '"' );
 
-	//TODO Retweet handling. See #3
-  // TODO remove retweet handling
-	// Retweet handling
-	if ( tweetActivity.verb === 'share') {
-		//Catch tweets from authorised user to verification - handle verification and then continue processing the tweet
-//		if ( tweetActivity.actor.preferredUsername === self.config.twitter.usernameVerify ) {
-//			self._processVerifiedReport( self._tweetOriginalTweetIdFromActivity(tweetActivity) );
-//		} else {
-			// If this was a retweet but not from our verification user, ignore it and do no further processing
-		self.logger.debug( "filter: Ignoring retweet from user " + tweetActivity.actor.preferredUsername );
-		return;
-	//	}
-	}
-
 	function botTweet(err, message) {
 		if (err){
 			self.logger.error('Error calling parseRequest - no reply sent');
