@@ -29,6 +29,7 @@ require('dotenv').config();
  * @property {boolen} twitter.send_enabled If true, send tweets to users asking them to verify their reports
  * @property {number} twitter.url_length Length that URLs in tweets are shortened to
  * @property {string} twitter.defaultLanguage The default language code to use if we can't resolve one from the tweet
+ * @property {object} twitter.dialogue Stored twitter responses
  * @property {boolean} twitter.addTimestamp If true, append a timestamp to each sent tweet
  * @property {object} twitter.media_id Media to be included with auto-reply tweets
  */
@@ -87,10 +88,6 @@ config.twitter.dialogue.ahoy.in = 'Hello, I am RiskMapBot, reply with #flood to 
 config.twitter.dialogue.requests.card.en = 'Hi! Report flood using this link. Thanks!';
 config.twitter.dialogue.requests.card.id = 'Hai! Gunakan link ini untuk menginput lokasi banjir, keterangan, & foto.';
 config.twitter.dialogue.requests.card.in = 'Hi! Report flood using this link. Thanks!';
-
-
-
-
 
 // Append a timestamp to each sent tweet except response to confirmed reports with unique urls
 config.twitter.addTimestamp = false;
