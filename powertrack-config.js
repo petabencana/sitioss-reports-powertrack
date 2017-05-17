@@ -79,11 +79,11 @@ config.twitter.defaultLanguage = 'en'; // The default language code to use if we
 config.twitter.dialogue = {};
 config.twitter.dialogue.ahoy = {};          // Greet users
 config.twitter.dialogue.requests = {};      // Respond to user requests
-config.twitter.dialogue.requests.card = {}  // Flood report card responses
+config.twitter.dialogue.requests.card = {};  // Flood report card responses
 // Dialogue translations
-config.twitter.dialogue.ahoy.en = 'Hello, I am RiskMapBot, reply with #flood to send me your flood report.'
-config.twitter.dialogue.ahoy.id =  'Halo, saya RiskMapBot. Untuk melaporkan banjir di sekitarmu, silakan balas dengan #banjir.'
-config.twitter.dialogue.ahoy.in = 'Hello, I am RiskMapBot, reply with #flood to send me your flood report.'
+config.twitter.dialogue.ahoy.en = 'Hello, I am RiskMapBot, reply with #flood to send me your flood report.';
+config.twitter.dialogue.ahoy.id =  'Halo, saya RiskMapBot. Untuk melaporkan banjir di sekitarmu, silakan balas dengan #banjir.';
+config.twitter.dialogue.ahoy.in = 'Hello, I am RiskMapBot, reply with #flood to send me your flood report.';
 config.twitter.dialogue.requests.card.en = 'Hi! Report flood using this link. Thanks!';
 config.twitter.dialogue.requests.card.id = 'Hai! Gunakan link ini untuk menginput lokasi banjir, keterangan, & foto.';
 config.twitter.dialogue.requests.card.in = 'Hi! Report flood using this link. Thanks!';
