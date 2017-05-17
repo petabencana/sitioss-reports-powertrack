@@ -104,10 +104,10 @@ config.twitter.network_name = 'twitter';
 
 // Cognicity Card Server Details
 config.card_server = {};
-config.card_server.address = process.env.COGNICITY_SERVER; // E.g. https://server.com/cards
+config.card_server.address = process.env.CARD_SERVER_ADDRESS; // E.g. https://server.com/cards
+config.card_server.x_api_key = process.env.X_API_KEY; // AWS API Auth
 config.front_end = {};
 config.front_end.card_url_prefix = process.env.CARDS_PREFIX;
-config.card_server.x_api_key = process.env.X_API_KEY; // AWS API Auth
 
 // Export config object
 module.exports = config;
