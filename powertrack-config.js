@@ -50,7 +50,7 @@ config.gnip.rulesUrl = process.env.GNIP_RULES_URL; // Gnip rules URL, take from 
 // Gnip rules, enter as an object where the key is the rule name and the value is the rule as a string
 config.gnip.rules = {
     "boundingbox":"(contains:flood OR contains:rains) (bounding_box:[80.0900 12.8400 80.3800 13.0517] OR bounding_box:[80.0900 13.0517 80.3800 13.2555])",
-    "addressed":"(contains:flood OR contains:rains) @riskmapindia",
+    "addressed":"(contains:flood OR contains:rains OR contains:prep) @riskmapindia",
     "location":"(contains:flood OR contains:rains) (bio_location:chennai OR place:chennai OR bounding_box:[80.0900 12.8400 80.3800 13.0517] OR bounding_box:[80.0900 13.0517 80.3800 13.2555])"
 };
 
@@ -61,6 +61,7 @@ config.gnip.backfillMinutes = 5; // backfill in minutes on reconnect to the stre
 config.twitter = {};
 //TODO grasp & re-tweet verification see #3
 config.twitter.usernameVerify = ''; // Twitter username (without @) authorised to verify reports via retweet functionality
+// TODO MOVE TO ENV variable
 config.twitter.usernameReplyBlacklist = 'petabencana,BPBDJakarta'; // Twitter usernames (without @, comma separated for multiples) which will never be sent to in response to tweet processing
 config.twitter.consumer_key = process.env.TWITTER_CONSUMER_KEY; // Take from the twitter dev admin interface
 config.twitter.consumer_secret = process.env.TWITTER_CONSUMER_SECRET; // Take from the twitter dev admin interface
@@ -92,18 +93,21 @@ config.twitter.dialogue.requests.card.in = 'Hi! Report flood using this link. Th
 // Append a timestamp to each sent tweet except response to confirmed reports with unique urls
 config.twitter.addTimestamp = false;
 
+// TODO - ADD MEDIA SUPPORT FOR INDIA
 // Add a specified twitter media to replies
 config.twitter.media_id = {};
 // See note above - GNIP uses 'in' to represent the Indonesian language.
 config.twitter.media_id.id = process.env.TWITTER_MEDIA_ID_ID;
 config.twitter.media_id.en = process.env.TWITTER_MEDIA_ID_EN;
+// Name of network passed when a card is requested
+config.twitter.network_name = 'twitter';
 
-// Cognicity details
-config.cognicity = {};
-config.cognicity.server = process.env.COGNICITY_SERVER;
-config.cognicity.card_url_prefix = process.env.CARDS_PREFIX;
-config.cognicity.network = 'twitter';
-config.cognicity.x_api_key = process.env.X_API_KEY;
+// Cognicity Card Server Details
+config.card_server = {};
+config.card_server.address = process.env.COGNICITY_SERVER; // E.g. https://server.com/cards
+config.front_end = {};
+config.front_end.card_url_prefix = process.env.CARDS_PREFIX;
+config.card_server.x_api_key = process.env.X_API_KEY; // AWS API Auth
 
 // Export config object
 module.exports = config;

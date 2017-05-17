@@ -4,18 +4,6 @@
 const request = require('request');
 require('dotenv').config({silent:true});
 
-// GRASP card
-const options = {
-  host: self.config.cognicity.server,
-  path: '/cards',
-  method: 'POST',
-  port: 80,
-  headers: {
-    'x-api-key': self.config.cognicity.x_api_key,
-    'Content-Type': 'application/json'
-  }
-};
-
 // Prototype object this object extends from - contains basic twitter interaction functions
 var BaseTwitterDataSource = require('../BaseTwitterDataSource/BaseTwitterDataSource.js');
 
@@ -141,6 +129,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	self.logger.verbose( 'filter: Received tweetActivity: screen_name="' + tweetActivity.actor.preferredUsername + '", text="' + tweetActivity.body.replace("\n", "") + '", coordinates="' + (tweetActivity.geo && tweetActivity.geo.coordinates ? tweetActivity.geo.coordinates[1]+", "+tweetActivity.geo.coordinates[0] : 'N/A') + '"' );
 
 	//TODO Retweet handling. See #3
+  // TODO remove retweet handling
 	// Retweet handling
 	if ( tweetActivity.verb === 'share') {
 		//Catch tweets from authorised user to verification - handle verification and then continue processing the tweet
@@ -198,12 +187,12 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 
       case 'banjir':
         self.logger.info('Bot detected request keyword "banjir"');
-        self._getCardLink(username, self.config.cognicity.network, language, botTweet);
+        self._getCardLink(username, self.config.twitter.network_name, language, botTweet);
 				break;
 
       case 'flood':
         self.logger.info('Bot detected request keyword "flood"');
-				self._getCardLink(username, self.config.cognicity.network, language, botTweet);
+				self._getCardLink(username, self.config.twitter.network_name, language, botTweet);
 				break;
     }
 	}
@@ -220,6 +209,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	}
 
 	// Everything incoming has a keyword already, so we now try and categorize it using the Gnip tags
+  // TODO change jbd variable name to "within_location"
 	var jbd = false;
 	var addressed = false;
 
@@ -504,17 +494,21 @@ PowertrackDataSource.prototype._getCardLink = function(username, network, langua
 
   // Get a card from Cognicity server
   request({
-    url: options.host + options.path,
-    method: options.method,
-    headers: options.headers,
-    port: options.port,
+    url: self.config.card_server.address,
+    method: 'POST',
+    headers: {
+        'x-api-key': self.config.card_server.x_api_key,
+        'Content-Type': 'application/json'
+    },
+    port: 80,
     json: true,
     body: card_request
   }, function(error, response, body){
     if (!error && response.statusCode === 200){
       self.logger.info('Fetched card id: ' + body.cardId);
       // Construct the card link to be sent to the user
-      var cardLink = self.config.cognicity.card_url_prefix + body.cardId + '/location';
+      // TODO - ADD CODE FOR PREP CARDS
+      var cardLink = self.config.front_end.card_url_prefix + body.cardId + '/location';
 			var messageText =  self._getDialogue(self.config.twitter.dialogue.requests.card, language) + ' ' + cardLink;
 			callback(null, messageText);
     } else {
