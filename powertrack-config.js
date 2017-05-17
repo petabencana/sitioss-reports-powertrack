@@ -1,7 +1,7 @@
 'use strict';
 require('dotenv').config();
 
-// sample-powertrack-config.js - sample configuration file for cognicity-reports-powertrack module
+// powertrack-config.js - configuration file for cognicity-reports-powertrack module
 
 /**
  * Configuration for cognicity-reports-powertrack
@@ -84,8 +84,6 @@ config.twitter.dialogue.requests.card = {}  // Flood report card responses
 config.twitter.dialogue.ahoy.en = 'Hello, I am RiskMapBot, reply with #flood to send me your flood report.'
 config.twitter.dialogue.ahoy.id =  'Halo, saya RiskMapBot. Untuk melaporkan banjir di sekitarmu, silakan balas dengan #banjir.'
 config.twitter.dialogue.ahoy.in = 'Hello, I am RiskMapBot, reply with #flood to send me your flood report.'
-// Respond to user requests
-config.twitter.dialogue.requests = {};
 config.twitter.dialogue.requests.card.en = 'Hi! Report flood using this link. Thanks!';
 config.twitter.dialogue.requests.card.id = 'Hai! Gunakan link ini untuk menginput lokasi banjir, keterangan, & foto.';
 config.twitter.dialogue.requests.card.in = 'Hi! Report flood using this link. Thanks!';
