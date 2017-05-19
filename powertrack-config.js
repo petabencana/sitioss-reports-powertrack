@@ -106,6 +106,7 @@ config.twitter.network_name = 'twitter';
 config.card_server = {};
 config.card_server.address = process.env.CARD_SERVER_ADDRESS; // E.g. https://server.com/cards
 config.card_server.x_api_key = process.env.X_API_KEY; // AWS API Auth
+config.card_server.port = process.env.CARD_SERVER_PORT || 80;
 config.front_end = {};
 config.front_end.card_url_prefix = process.env.CARDS_PREFIX;
 

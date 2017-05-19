@@ -486,7 +486,7 @@ PowertrackDataSource.prototype._getCardLink = function(username, network, langua
         'x-api-key': self.config.card_server.x_api_key,
         'Content-Type': 'application/json'
     },
-    port: 80,
+    port: self.config.card_server.port,
     json: true,
     body: card_request
   }, function(error, response, body){
