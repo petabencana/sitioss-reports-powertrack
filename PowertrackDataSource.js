@@ -79,7 +79,7 @@ PowertrackDataSource.prototype._checkAgainstLastTweetID = function(tweetActivity
 
 PowertrackDataSource.prototype._storeTweetID = function(tweetActivity, callback) {
  var self = this;
-
+ 
  var tweet_id = self._parseTweetIdFromActivity(tweetActivity);
 
  self.reports.dbQuery(
@@ -106,8 +106,13 @@ PowertrackDataSource.prototype._getlastTweetIDFromDatabase = function(callback) 
 			text: "SELECT id FROM twitter.seen_tweet_id;"
 		},
 		function(result) {
-			self.lastTweetID = Number(result.rows[0].id);
-			callback();
+			if(result.rows && result.rows.length > 1) {
+				self.lastTweetID = Number(result.rows[0].id);
+				callback();
+			} else {
+				self.lastTweetID = 0;
+				callback();
+			}
 		}
 	);
 };
@@ -160,7 +165,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	function parseRequest(tweetActivity){
 		var username = tweetActivity.actor.preferredUsername;
 		var words = tweetActivity.body;
-    var filter = words.match(/banjir|flood/gi);
+    var filter = words.match(/banjir|flood|prep/gi);
 		var language = self._parseLangsFromActivity(tweetActivity)[0];
 
     if (filter){filter = filter[0];}
@@ -173,13 +178,18 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 
       case 'banjir':
         self.logger.info('Bot detected request keyword "banjir"');
-        self._getCardLink(username, self.config.twitter.network_name, language, botTweet);
+        self._getCardLink(username, self.config.twitter.network_name, language, 'flood', botTweet);
 				break;
 
       case 'flood':
         self.logger.info('Bot detected request keyword "flood"');
-				self._getCardLink(username, self.config.twitter.network_name, language, botTweet);
+				self._getCardLink(username, self.config.twitter.network_name, language, 'flood', botTweet);
 				break;
+
+			case 'prep':
+	      self.logger.info('Bot detected request keyword "prep"');
+			  self._getCardLink(username, self.config.twitter.network_name, language, 'prep', botTweet);
+			  break;
     }
 	}
 
@@ -383,7 +393,6 @@ PowertrackDataSource.prototype.start = function() {
 	rules.live.update(newRules, function(err) {
 	    if (err) throw err;
 		self.logger.info('connectStream: Connecting stream...');
-
 		// If we pushed the rules successfully, get last seen report, and then try and connect the stream
 		self._getlastTweetIDFromDatabase(function(){
 			stream.start();
@@ -470,7 +479,7 @@ PowertrackDataSource.prototype._ahoy = function(username, language, callback){
 	callback(null, self._getDialogue(self.config.twitter.dialogue.ahoy, language));
 };
 
-PowertrackDataSource.prototype._getCardLink = function(username, network, language, callback) {
+PowertrackDataSource.prototype._getCardLink = function(username, network, language, disasterType, callback) {
 	var self = this;
 
 	var card_request = {"username": username,
@@ -494,7 +503,7 @@ PowertrackDataSource.prototype._getCardLink = function(username, network, langua
       self.logger.info('Fetched card id: ' + body.cardId);
       // Construct the card link to be sent to the user
       // TODO - ADD CODE FOR PREP CARDS
-      var cardLink = self.config.front_end.card_url_prefix + body.cardId + '/location';
+      var cardLink = self.config.front_end.card_url_prefix + disasterType + "/" + body.cardId + '/location';
 			var messageText =  self._getDialogue(self.config.twitter.dialogue.requests.card, language) + ' ' + cardLink;
 			callback(null, messageText);
     } else {

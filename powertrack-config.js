@@ -49,9 +49,9 @@ config.gnip.streamUrl = process.env.GNIP_STREAM_URL; // Gnip stream URL, take fr
 config.gnip.rulesUrl = process.env.GNIP_RULES_URL; // Gnip rules URL, take from the Gnip admin interface.
 // Gnip rules, enter as an object where the key is the rule name and the value is the rule as a string
 config.gnip.rules = {
-    "boundingbox":"(contains:flood OR contains:rains) (bounding_box:[80.0900 12.8400 80.3800 13.0517] OR bounding_box:[80.0900 13.0517 80.3800 13.2555])",
-    "addressed":"(contains:flood OR contains:rains OR contains:prep) @riskmapindia",
-    "location":"(contains:flood OR contains:rains) (bio_location:chennai OR place:chennai OR bounding_box:[80.0900 12.8400 80.3800 13.0517] OR bounding_box:[80.0900 13.0517 80.3800 13.2555])"
+    "boundingbox":"(contains:flood OR contains:rains OR contains:monsoon prep) (bounding_box:[80.0900 12.8400 80.3800 13.0517] OR bounding_box:[80.0900 13.0517 80.3800 13.2555])",
+    "addressed":"(contains:flood OR contains:rains OR contains:monsoon prep) @riskmapindia",
+    "location":"(contains:flood OR contains:rains OR contains:monsoon prep) (bio_location:chennai OR place:chennai OR bounding_box:[80.0900 12.8400 80.3800 13.0517] OR bounding_box:[80.0900 13.0517 80.3800 13.2555])"
 };
 
 config.gnip.maxReconnectTimeout = 1000 * 60 * 5; // In milliseconds; 5 minutes for max reconnection timeout - will mean ~10 minutes from first disconnection
