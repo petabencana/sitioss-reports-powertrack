@@ -79,7 +79,7 @@ PowertrackDataSource.prototype._checkAgainstLastTweetID = function(tweetActivity
 
 PowertrackDataSource.prototype._storeTweetID = function(tweetActivity, callback) {
  var self = this;
- 
+
  var tweet_id = self._parseTweetIdFromActivity(tweetActivity);
 
  self.reports.dbQuery(
@@ -219,25 +219,25 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	// Perform the actions for the categorization of the tweet
 	if ( jbd && addressed ) {
 
-		self.logger.verbose("Tweet is addressed and within JBD -> parse by bot");
+		self.logger.verbose("Tweet is addressed and within target city -> parse by bot");
 
 		parseRequest(tweetActivity);
 
 	} else if ( jbd && !addressed ) {
 
-		self.logger.verbose("Tweet is not addressed and within JBD -> send ahoy");
+		self.logger.verbose("Tweet is not addressed and within target city -> send ahoy");
 
 		sendAhoy(tweetActivity);
 
 	} else if ( !jbd && addressed ) {
 
-		self.logger.verbose("Not in JBD but addressed -> parse by bot");
+		self.logger.verbose("Not in target city but addressed -> parse by bot");
 
 		parseRequest(tweetActivity);
 
 	} else {
 		// Not in bounding box but has geocoordinates or no location match
-		self.logger.warn( 'filter: Tweet did not match category actions (not in JBD nor addressed)' );
+		self.logger.warn( 'filter: Tweet did not match category actions (not in target city nor addressed)' );
 	}
 
 };
