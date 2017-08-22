@@ -13,7 +13,7 @@ var PowertrackDataSource = require('./PowertrackDataSource');
 var config = require('./powertrack-config');
 
 // ntwitter twitter interface module
-var Twitter = require('ntwitter');
+var Twitter = require('twitter');
 
 /**
  * The constructor function we expose takes a reports object and returns an instance of this

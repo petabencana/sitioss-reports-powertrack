@@ -1,10 +1,11 @@
 'use strict';
 
+// Request module to call cognicity-server
+const request = require('request');
+require('dotenv').config({silent:true});
+
 // Prototype object this object extends from - contains basic twitter interaction functions
 var BaseTwitterDataSource = require('../BaseTwitterDataSource/BaseTwitterDataSource.js');
-
-// Require Bot library
-var Bot = require('../cognicity-grasp/index.js');
 
 /**
  * The Gnip Powertrack data source.
@@ -23,7 +24,6 @@ var PowertrackDataSource = function PowertrackDataSource(
 
 	// Store references to constructor arguments
 	this.config = config;
-	this.bot = Bot(reports.config, reports.logger, reports.pg);
 
 	BaseTwitterDataSource.call(this, reports, twitter);
 
@@ -106,8 +106,13 @@ PowertrackDataSource.prototype._getlastTweetIDFromDatabase = function(callback) 
 			text: "SELECT id FROM twitter.seen_tweet_id;"
 		},
 		function(result) {
-			self.lastTweetID = Number(result.rows[0].id);
-			callback();
+			if(result.rows && result.rows.length > 1) {
+				self.lastTweetID = Number(result.rows[0].id);
+				callback();
+			} else {
+				self.lastTweetID = 0;
+				callback();
+			}
 		}
 	);
 };
@@ -128,22 +133,9 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	var self = this;
 	self.logger.verbose( 'filter: Received tweetActivity: screen_name="' + tweetActivity.actor.preferredUsername + '", text="' + tweetActivity.body.replace("\n", "") + '", coordinates="' + (tweetActivity.geo && tweetActivity.geo.coordinates ? tweetActivity.geo.coordinates[1]+", "+tweetActivity.geo.coordinates[0] : 'N/A') + '"' );
 
-	//TODO Retweet handling. See #3
-	// Retweet handling
-	if ( tweetActivity.verb === 'share') {
-		//Catch tweets from authorised user to verification - handle verification and then continue processing the tweet
-//		if ( tweetActivity.actor.preferredUsername === self.config.twitter.usernameVerify ) {
-//			self._processVerifiedReport( self._parseRetweetOriginalTweetIdFromActivity(tweetActivity) );
-//		} else {
-			// If this was a retweet but not from our verification user, ignore it and do no further processing
-		self.logger.debug( "filter: Ignoring retweet from user " + tweetActivity.actor.preferredUsername );
-		return;
-	//	}
-	}
-
 	function botTweet(err, message) {
 		if (err){
-			self.logger.error('Error calling bot.parseRequest - no reply sent');
+			self.logger.error('Error calling parseRequest - no reply sent');
 		}
 		else {
 			// tweetActivity, null media, message, null callback
@@ -153,7 +145,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 
 	function botTweetWithMedia(err, message) {
 		if (err) {
-			self.logger.error('Error calling bot.parseRequest - no reply sent');
+			self.logger.error('Error calling parseRequest - no reply sent');
 		}
 		else {
 			// Set default media link
@@ -171,18 +163,49 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	}
 
 	function parseRequest(tweetActivity){
-		self.bot.parseRequest(tweetActivity.actor.preferredUsername, tweetActivity.body, self._parseLangsFromActivity(tweetActivity)[0], botTweet);
+		var username = tweetActivity.actor.preferredUsername;
+		var words = tweetActivity.body;
+    var filter = words.match(/banjir|flood|prep/gi);
+		var language = self._parseLangsFromActivity(tweetActivity)[0];
+
+    if (filter){filter = filter[0];}
+
+    switch (filter){
+      case null:
+        self.logger.info('Bot could not detect request keyword');
+				self._ahoy(username, language, botTweet); //Respond with default
+				break;
+
+      case 'banjir':
+        self.logger.info('Bot detected request keyword "banjir"');
+        self._getCardLink(username, self.config.twitter.network_name, language, 'flood', botTweet);
+				break;
+
+      case 'flood':
+        self.logger.info('Bot detected request keyword "flood"');
+				self._getCardLink(username, self.config.twitter.network_name, language, 'flood', botTweet);
+				break;
+
+			case 'prep':
+	      self.logger.info('Bot detected request keyword "prep"');
+			  self._getCardLink(username, self.config.twitter.network_name, language, 'prep', botTweet);
+			  break;
+    }
 	}
 
 	function sendAhoy(tweetActivity){
+		var username = tweetActivity.actor.preferredUsername;
+		var language = self._parseLangsFromActivity(tweetActivity)[0];
+
 		self._ifNewUser(tweetActivity.actor.preferredUsername, function(username_hash){
-			self.bot.ahoy(tweetActivity.actor.preferredUsername, self._parseLangsFromActivity(tweetActivity)[0], botTweetWithMedia);
+			self._ahoy(username, language, botTweetWithMedia); //Respond with default
 			self._insertInvitee(tweetActivity);
 		});
 		return;
 	}
 
 	// Everything incoming has a keyword already, so we now try and categorize it using the Gnip tags
+  // TODO change jbd variable name to "within_location"
 	var jbd = false;
 	var addressed = false;
 
@@ -196,25 +219,25 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	// Perform the actions for the categorization of the tweet
 	if ( jbd && addressed ) {
 
-		self.logger.verbose("Tweet is addressed and within JBD -> parse by bot");
+		self.logger.verbose("Tweet is addressed and within target city -> parse by bot");
 
 		parseRequest(tweetActivity);
 
 	} else if ( jbd && !addressed ) {
 
-		self.logger.verbose("Tweet is not addressed and within JBD -> send ahoy");
+		self.logger.verbose("Tweet is not addressed and within target city -> send ahoy");
 
 		sendAhoy(tweetActivity);
 
 	} else if ( !jbd && addressed ) {
 
-		self.logger.verbose("Not in JBD but addressed -> parse by bot");
+		self.logger.verbose("Not in target city but addressed -> parse by bot");
 
 		parseRequest(tweetActivity);
 
 	} else {
 		// Not in bounding box but has geocoordinates or no location match
-		self.logger.warn( 'filter: Tweet did not match category actions (not in JBD nor addressed)' );
+		self.logger.warn( 'filter: Tweet did not match category actions (not in target city nor addressed)' );
 	}
 
 };
@@ -241,26 +264,10 @@ PowertrackDataSource.prototype.start = function() {
 	// Send a notification on an extended disconnection
 	var disconnectionNotificationSent = false;
 
-	// Function to watch for incoming cards in the database and send replies
-	function confirmReports(){
-		self.bot.confirm(function(err, username, message){
-			self._baseSendReplyTweet(
-				username,
-				null,
-				null,
-				message,
-				function(){
-					self.logger.debug("Sent received report confirmation message");
-					return;
-				}
-			);
-		});
-	}
-
 	// Attempt to reconnect the socket.
 	// If we fail, wait an increasing amount of time before we try again.
 	function reconnectSocket() {
-		// Try and destroy the existing socket, if it exists
+		// Try and destroy the existing socket, if it existsconfirmReports
 		self.logger.warn( 'connectStream: Connection lost, destroying socket' );
 		if ( stream._req ) stream._req.destroy();
 
@@ -386,13 +393,11 @@ PowertrackDataSource.prototype.start = function() {
 	rules.live.update(newRules, function(err) {
 	    if (err) throw err;
 		self.logger.info('connectStream: Connecting stream...');
-
 		// If we pushed the rules successfully, get last seen report, and then try and connect the stream
 		self._getlastTweetIDFromDatabase(function(){
 			stream.start();
 		});
 	});
-	confirmReports();
 };
 
 /**
@@ -454,6 +459,59 @@ PowertrackDataSource.prototype._parseLangsFromActivity = function(tweetActivity)
 	if (tweetActivity.gnip && tweetActivity.gnip.language && tweetActivity.gnip.language.value) langs.push(tweetActivity.gnip.language.value);
 
 	return langs;
+};
+
+/**
+ * Returns text to be tweeted to the user based on the dialogue type
+ * @param  {String} dialogue Dialogue Type (ahoy, requests.card)
+ * @param  {String} language Text string containing ISO 639-1 two letter language code e.g. 'en', 'id'
+ */
+PowertrackDataSource.prototype._getDialogue = function(dialogue, language){
+	var self = this;
+	if (language in dialogue === false) {
+		language = self.config.twitter.defaultLanguage;
+	}
+	return (dialogue[language]);
+};
+
+PowertrackDataSource.prototype._ahoy = function(username, language, callback){
+	var self = this;
+	callback(null, self._getDialogue(self.config.twitter.dialogue.ahoy, language));
+};
+
+PowertrackDataSource.prototype._getCardLink = function(username, network, language, disasterType, callback) {
+	var self = this;
+
+	var card_request = {"username": username,
+      								"network": network,
+											"language": language
+										};
+
+  // Get a card from Cognicity server
+  request({
+    url: self.config.card_server.address,
+    method: 'POST',
+    headers: {
+        'x-api-key': self.config.card_server.x_api_key,
+        'Content-Type': 'application/json'
+    },
+    port: self.config.card_server.port,
+    json: true,
+    body: card_request
+  }, function(error, response, body){
+    if (!error && response.statusCode === 200){
+      self.logger.info('Fetched card id: ' + body.cardId);
+      // Construct the card link to be sent to the user
+      // TODO - ADD CODE FOR PREP CARDS
+      var cardLink = self.config.front_end.card_url_prefix + disasterType + "/" + body.cardId + '/location';
+			var messageText =  self._getDialogue(self.config.twitter.dialogue.requests.card, language) + ' ' + cardLink;
+			callback(null, messageText);
+    } else {
+			var err = 'Error getting card: ' + JSON.stringify(error) + JSON.stringify(response);
+      self.logger.error(err);
+			callback(err, null);
+    }
+  });
 };
 
 // Export the PowertrackDataSource constructor
