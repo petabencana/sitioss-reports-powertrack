@@ -6,25 +6,26 @@
   "preferGlobal": false,
   "private": true,
   "dependencies": {
-    "gnip": "^1.0.3",
-    "ntwitter": "^0.5.0",
-    "rsvp": "^3.3.3"
+    "gnip": "^1.1.0",
+    "request": "^2.81.0",
+    "rsvp": "^3.3.3",
+    "twitter": "^1.7.0"
   },
   "devDependencies": {
-    "jsdoc": "^3.2.0",
-    "jshint": "^2.9.2",
-    "mocha": "^3.0.0-1",
+    "jsdoc": "^3.4.3",
+    "jshint": "^2.9.4",
+    "mocha": "^3.2.0",
     "unit.js": "^2.0.0",
-    "istanbul": "^0.4.4"
+    "istanbul": "^0.4.5"
   },
   "engines": {
     "node": "^4.2.1"
   },
   "scripts": {
     "test": "npm run jshint",
-    "jshint": "jshint index.js PowertrackDataSource.js sample-powertrack-config.js test/testPowertrackDataSource.js twitter-send-test/twitter-send-test.js twitter-reply-test/twitter-reply-test.js",
+    "jshint": "jshint index.js PowertrackDataSource.js powertrack-config.js test/testPowertrackDataSource.js twitter-send-test/twitter-send-test.js twitter-reply-test/twitter-reply-test.js",
     "mocha": "mocha test",
-    "build-docs": "jsdoc -d docs package.json index.js sample-powertrack-config.js PowertrackDataSource.js ../BaseTwitterDataSource/BaseTwitterDataSource.js",
+    "build-docs": "jsdoc -d docs package.json index.js powertrack-config.js PowertrackDataSource.js ../BaseTwitterDataSource/BaseTwitterDataSource.js",
     "build": "npm test && npm run build-docs && npm run coverage",
     "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha"
   }

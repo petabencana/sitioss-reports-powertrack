@@ -5,3 +5,4 @@ docs/
 .settings/
 coverage/
 .env
+.DS_Store
