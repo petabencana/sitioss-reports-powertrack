@@ -457,7 +457,6 @@ PowertrackDataSource.prototype._parseLangsFromActivity = function(tweetActivity)
 
 	if (tweetActivity.twitter_lang) langs.push(tweetActivity.twitter_lang);
 	if (tweetActivity.gnip && tweetActivity.gnip.language && tweetActivity.gnip.language.value) langs.push(tweetActivity.gnip.language.value);
-
 	return langs;
 };
 
