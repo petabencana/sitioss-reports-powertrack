@@ -47,6 +47,7 @@ config.gnip.username = process.env.GNIP_USERNAME; // Gnip username
 config.gnip.password = process.env.GNIP_PASSWORD; // Gnip password
 config.gnip.streamUrl = process.env.GNIP_STREAM_URL; // Gnip stream URL, take from the Gnip admin interface.
 config.gnip.rulesUrl = process.env.GNIP_RULES_URL; // Gnip rules URL, take from the Gnip admin interface.
+config.gnip.areaTags = [ 'jbd', 'bdg', 'sby' ]; // Tags used in gnip rules to delineate areas
 // Gnip rules, enter as an object where the key is the rule name and the value is the rule as a string
 config.gnip.rules = {
   "addressed": "(contains:flood OR contains:banjir OR contains:jakartabanjir) @petabencana OR (contains:flood OR contains:banjir OR contains:jakartabanjir) @petajkt",

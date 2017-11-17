@@ -205,31 +205,32 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	}
 
 	// Everything incoming has a keyword already, so we now try and categorize it using the Gnip tags
-  // TODO change jbd variable name to "within_location"
-	var jbd = false;
+	var insideArea = false;
 	var addressed = false;
 
 	tweetActivity.gnip.matching_rules.forEach( function(rule){
 		if (rule.tag) {
 			if (rule.tag.indexOf("addressed")===0) addressed = true;
-			if (rule.tag.indexOf("jbd")===0) jbd = true;
+			self.config.gnip.areaTags.forEach( function(areaTag){
+				if (rule.tag.indexOf(areaTag)===0) insideArea = true;
+			});
 		}
 	});
 
 	// Perform the actions for the categorization of the tweet
-	if ( jbd && addressed ) {
+	if ( insideArea && addressed ) {
 
 		self.logger.verbose("Tweet is addressed and within target city -> parse by bot");
 
 		parseRequest(tweetActivity);
 
-	} else if ( jbd && !addressed ) {
+	} else if ( insideArea && !addressed ) {
 
 		self.logger.verbose("Tweet is not addressed and within target city -> send ahoy");
 
 		sendAhoy(tweetActivity);
 
-	} else if ( !jbd && addressed ) {
+	} else if ( !insideArea && addressed ) {
 
 		self.logger.verbose("Not in target city but addressed -> parse by bot");
 
