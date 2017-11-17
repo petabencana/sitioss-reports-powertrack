@@ -504,7 +504,7 @@ PowertrackDataSource.prototype._getCardLink = function(username, network, langua
       self.logger.info('Fetched card id: ' + body.cardId);
       // Construct the card link to be sent to the user
       // TODO - ADD CODE FOR PREP CARDS
-      var cardLink = self.config.front_end.card_url_prefix + disasterType + "/" + body.cardId + '/location';
+      var cardLink = self.config.front_end.card_url_prefix + disasterType + "/" + body.cardId;
 			var messageText =  self._getDialogue(self.config.twitter.dialogue.requests.card, language) + ' ' + cardLink;
 			callback(null, messageText);
     } else {
