@@ -27,3 +27,7 @@ CogniCity
 
 ### v3.0.0 - 21/12/2016
 * Re-factored PowerTrack module to use GRASP to control user response
+
+### v3.0.1 - 07/12/2017
+* Merged GRASP code into PowerTrack module
+* Added Semarang as new instance region
