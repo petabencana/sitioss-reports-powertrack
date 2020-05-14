@@ -165,7 +165,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	function parseRequest(tweetActivity){
 		var username = tweetActivity.actor.preferredUsername;
 		var words = tweetActivity.body;
-    var filter = words.match(/banjir|flood|prep/gi);
+    var filter = words.match(/banjir|flood|gempa|earthquake|prep/gi);
 		var language = self._parseLangsFromActivity(tweetActivity)[0];
 
     if (filter){filter = filter[0];}
@@ -179,17 +179,27 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
       case 'banjir':
         self.logger.info('Bot detected request keyword "banjir"');
         self._getCardLink(username, self.config.twitter.network_name, language, 'flood', botTweet);
-				break;
+		break;
 
       case 'flood':
         self.logger.info('Bot detected request keyword "flood"');
-				self._getCardLink(username, self.config.twitter.network_name, language, 'flood', botTweet);
-				break;
+		self._getCardLink(username, self.config.twitter.network_name, language, 'flood', botTweet);
+		break;
 
-			case 'prep':
-	      self.logger.info('Bot detected request keyword "prep"');
-			  self._getCardLink(username, self.config.twitter.network_name, language, 'prep', botTweet);
-			  break;
+      case 'gempa':
+        self.logger.info('Bot detected request keyword "gempa"');
+        self._getCardLink(username, self.config.twitter.network_name, language, 'earthquake', botTweet);
+		break;
+
+      case 'earthquake':
+        self.logger.info('Bot detected request keyword "earthquake"');
+		self._getCardLink(username, self.config.twitter.network_name, language, 'earthquake', botTweet);
+		break;
+
+	case 'prep':
+	self.logger.info('Bot detected request keyword "prep"');
+		self._getCardLink(username, self.config.twitter.network_name, language, 'prep', botTweet);
+		break;
     }
 	}
 
@@ -503,7 +513,7 @@ PowertrackDataSource.prototype._getCardLink = function(username, network, langua
       self.logger.info('Fetched card id: ' + body.cardId);
       // Construct the card link to be sent to the user
       // TODO - ADD CODE FOR PREP CARDS
-      var cardLink = self.config.front_end.card_url_prefix + disasterType + "/" + body.cardId;
+      var cardLink = self.config.front_end.card_url_prefix + body.cardId + "/" + disasterType;
 			var messageText =  self._getDialogue(self.config.twitter.dialogue.requests.card, language) + ' ' + cardLink;
 			callback(null, messageText);
     } else {
