@@ -177,22 +177,26 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 				break;
 
       case 'banjir':
-        self.logger.info('Bot detected request keyword "banjir"');
+		self.logger.info('Bot detected request keyword "banjir"');
+		language = 'id';
         self._getCardLink(username, self.config.twitter.network_name, language, 'flood', botTweet);
 		break;
 
       case 'flood':
-        self.logger.info('Bot detected request keyword "flood"');
+		self.logger.info('Bot detected request keyword "flood"');
+		language = 'en';
 		self._getCardLink(username, self.config.twitter.network_name, language, 'flood', botTweet);
 		break;
 
       case 'gempa':
-        self.logger.info('Bot detected request keyword "gempa"');
+		self.logger.info('Bot detected request keyword "gempa"');
+		language = 'id';
         self._getCardLink(username, self.config.twitter.network_name, language, 'earthquake', botTweet);
 		break;
 
       case 'earthquake':
-        self.logger.info('Bot detected request keyword "earthquake"');
+		self.logger.info('Bot detected request keyword "earthquake"');
+		language = 'en';
 		self._getCardLink(username, self.config.twitter.network_name, language, 'earthquake', botTweet);
 		break;
 
