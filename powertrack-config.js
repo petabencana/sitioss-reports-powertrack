@@ -87,11 +87,11 @@ config.twitter.dialogue.ahoy = {};          // Greet users
 config.twitter.dialogue.requests = {};      // Respond to user requests
 config.twitter.dialogue.requests.card = {};  // Flood report card responses
 // Dialogue translations
-config.twitter.dialogue.ahoy.en = 'Hello, I am Bencana Bot, reply with #flood to send me your flood report.';
+config.twitter.dialogue.ahoy.en = 'Hi, I’m Disaster Bot. To report flooding near you, reply with #flood.';
 config.twitter.dialogue.ahoy.id =  'Halo, saya Bencana Bot. Untuk melaporkan banjir di sekitarmu, silakan balas dengan #banjir.';
 config.twitter.dialogue.ahoy.in = 'Halo, saya Bencana Bot. Untuk melaporkan banjir di sekitarmu, silakan balas dengan #banjir.';
-config.twitter.dialogue.requests.card.en = 'Hi! Report flood using this link. Thanks!';
-config.twitter.dialogue.requests.card.id = 'Hai! Gunakan link ini untuk menginput lokasi banjir, keterangan, & foto.';
+config.twitter.dialogue.requests.card.en = 'Hi! Report the disaster in your area using this link. Thank you!';
+config.twitter.dialogue.requests.card.id = 'Hi! Laporkan bencana di sekitarmu menggunakan link ini. Terima kasih.';
 config.twitter.dialogue.requests.card.in = 'Hai! Gunakan link ini untuk menginput lokasi banjir, keterangan, & foto.';
 
 // Append a timestamp to each sent tweet except response to confirmed reports with unique urls
