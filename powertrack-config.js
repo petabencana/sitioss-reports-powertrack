@@ -84,12 +84,22 @@ config.twitter.defaultLanguage = 'id'; // The default language code to use if we
 // Dialogue containers
 config.twitter.dialogue = {};
 config.twitter.dialogue.ahoy = {};          // Greet users
+config.twitter.dialogue.ahoy.default = {};          // Greet users
+config.twitter.dialogue.ahoy.flood = {};          // Greet users
+config.twitter.dialogue.ahoy.earthquake = {};          // Greet users
 config.twitter.dialogue.requests = {};      // Respond to user requests
 config.twitter.dialogue.requests.card = {};  // Flood report card responses
 // Dialogue translations
-config.twitter.dialogue.ahoy.en = 'Hi, I’m Disaster Bot. To report flooding near you, reply with #flood.';
-config.twitter.dialogue.ahoy.id =  'Halo, saya Bencana Bot. Untuk melaporkan banjir di sekitarmu, silakan balas dengan #banjir.';
-config.twitter.dialogue.ahoy.in = 'Halo, saya Bencana Bot. Untuk melaporkan banjir di sekitarmu, silakan balas dengan #banjir.';
+config.twitter.dialogue.ahoy.default.en = 'Hi, I’m Disaster Bot. To report disaster near you, reply with #flood or #earthquake.';
+config.twitter.dialogue.ahoy.default.id =  'Halo, saya Bencana Bot. Untuk melaporkan banjir di sekitarmu, silakan balas dengan #banjir.';
+config.twitter.dialogue.ahoy.default.in = 'Halo, saya Bencana Bot. Untuk melaporkan banjir di sekitarmu, silakan balas dengan #banjir.';
+
+config.twitter.dialogue.ahoy.flood.en = 'Hi, I’m Disaster Bot. To report flooding near you, reply with #flood.';
+config.twitter.dialogue.ahoy.flood.id =  'Halo, saya Bencana Bot. Untuk melaporkan banjir di sekitarmu, silakan balas dengan #banjir.';
+
+config.twitter.dialogue.ahoy.earthquake.en = 'Hi, I’m Disaster Bot. To report earthquake impacts in your area, reply with #earthquake.';
+config.twitter.dialogue.ahoy.earthquake.id =  'Halo, saya Bencana Bot. Untuk melaporkan dampak gempa di sekitarmu, silakan balas dengan #gempa';
+
 config.twitter.dialogue.requests.card.en = 'Hi! Report the disaster in your area using this link. Thank you!';
 config.twitter.dialogue.requests.card.id = 'Hai! Laporkan bencana di sekitarmu menggunakan link ini. Terima kasih.';
 config.twitter.dialogue.requests.card.in = 'Hai! Gunakan link ini untuk menginput lokasi banjir, keterangan, & foto.';

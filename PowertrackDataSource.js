@@ -162,7 +162,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 		}
 	}
 
-	function parseRequest(tweetActivity){
+	function parseRequest(tweetActivity, addressed){
 		var username = tweetActivity.actor.preferredUsername;
 		var words = tweetActivity.body;
     var filter = words.match(/banjir|flood|gempa|earthquake|prep/gi);
@@ -173,38 +173,56 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
     switch (filter){
       case null:
         self.logger.info('Bot could not detect request keyword');
-				self._ahoy(username, language, botTweet); //Respond with default
-				break;
+				self._ahoy(username, 'default' ,language, botTweet); //Respond with default
+				return;
 
       case 'banjir':
 		self.logger.info('Bot detected request keyword "banjir"');
 		language = 'id';
-        self._getCardLink(username, self.config.twitter.network_name, language, 'flood', botTweet);
+		disaster = 'flood';
+        // self._getCardLink(username, self.config.twitter.network_name, language, 'flood', botTweet);
 		break;
 
       case 'flood':
 		self.logger.info('Bot detected request keyword "flood"');
 		language = 'en';
-		self._getCardLink(username, self.config.twitter.network_name, language, 'flood', botTweet);
+		disaster = 'flood';
+		// self._getCardLink(username, self.config.twitter.network_name, language, 'flood', botTweet);
 		break;
 
       case 'gempa':
 		self.logger.info('Bot detected request keyword "gempa"');
 		language = 'id';
-        self._getCardLink(username, self.config.twitter.network_name, language, 'earthquake', botTweet);
+		disaster = 'earthquake';
+        // self._getCardLink(username, self.config.twitter.network_name, language, 'earthquake', botTweet);
 		break;
 
       case 'earthquake':
 		self.logger.info('Bot detected request keyword "earthquake"');
 		language = 'en';
-		self._getCardLink(username, self.config.twitter.network_name, language, 'earthquake', botTweet);
+		disaster = 'earthquake';
+		// self._getCardLink(username, self.config.twitter.network_name, language, 'earthquake', botTweet);
 		break;
 
-	case 'prep':
-	self.logger.info('Bot detected request keyword "prep"');
-		self._getCardLink(username, self.config.twitter.network_name, language, 'prep', botTweet);
-		break;
-    }
+		case 'prep':
+			self.logger.info('Bot detected request keyword "prep"');
+			disaster = 'prep';
+			// self._getCardLink(username, self.config.twitter.network_name, language, 'prep', botTweet);
+			break;
+		}
+		if (addressed)
+			self._getCardLink(username, self.config.twitter.network_name, language, disaster, botTweet);
+		else
+			_sendStart(username, language, disaster, tweetActivity)
+	
+	}
+
+	function _sendStart(username, language, disaster, tweetActivity) {
+		self._ifNewUser(tweetActivity.actor.preferredUsername, function(username_hash){
+			self._ahoy(username, disaster, language, botTweetWithMedia); //Respond with default
+			self._insertInvitee(tweetActivity);
+		});
+		return;
 	}
 
 	function sendAhoy(tweetActivity){
@@ -236,19 +254,19 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 
 		self.logger.verbose("Tweet is addressed and within target city -> parse by bot");
 
-		parseRequest(tweetActivity);
+		parseRequest(tweetActivity, addressed);
 
 	} else if ( insideArea && !addressed ) {
 
 		self.logger.verbose("Tweet is not addressed and within target city -> send ahoy");
 
-		sendAhoy(tweetActivity);
+		parseRequest(tweetActivity, addressed);
 
 	} else if ( !insideArea && addressed ) {
 
 		self.logger.verbose("Not in target city but addressed -> parse by bot");
 
-		parseRequest(tweetActivity);
+		parseRequest(tweetActivity, addressed);
 
 	} else {
 		// Not in bounding box but has geocoordinates or no location match
@@ -488,9 +506,9 @@ PowertrackDataSource.prototype._getDialogue = function(dialogue, language){
 	return (dialogue[language]);
 };
 
-PowertrackDataSource.prototype._ahoy = function(username, language, callback){
+PowertrackDataSource.prototype._ahoy = function(username, disaster, language, callback){
 	var self = this;
-	callback(null, self._getDialogue(self.config.twitter.dialogue.ahoy, language));
+	callback(null, self._getDialogue(self.config.twitter.dialogue.ahoy[disaster], language));
 };
 
 PowertrackDataSource.prototype._getCardLink = function(username, network, language, disasterType, callback) {
