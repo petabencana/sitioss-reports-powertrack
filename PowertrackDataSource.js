@@ -166,15 +166,15 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 		var username = tweetActivity.actor.preferredUsername;
 		var words = tweetActivity.body;
     var filter = words.match(/banjir|flood|gempa|earthquake|prep/gi);
-		var language = self._parseLangsFromActivity(tweetActivity)[0];
-
+	var language = self._parseLangsFromActivity(tweetActivity)[0];
+	var disaster = 'default';
     if (filter){filter = filter[0];}
 
     switch (filter){
       case null:
         self.logger.info('Bot could not detect request keyword');
-				self._ahoy(username, 'default' ,language, botTweet); //Respond with default
-				return;
+		// self._ahoy(username, 'default' ,language, botTweet); //Respond with default
+		return;
 
       case 'banjir':
 		self.logger.info('Bot detected request keyword "banjir"');
@@ -203,17 +203,57 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 		disaster = 'earthquake';
 		// self._getCardLink(username, self.config.twitter.network_name, language, 'earthquake', botTweet);
 		break;
+	  case 'forestfire':
+		self.logger.info('Bot detected request keyword "forestfire"');
+		language = 'en';
+		disaster = 'fire';
+		break;
+	  case 'kebakaranhutan':
+		self.logger.info('Bot detected request keyword "kebakaranhutan"');
+		language = 'id';
+		disaster = 'fire';
+		break;
+	  case 'haze':
+		self.logger.info('Bot detected request keyword "haze"');
+		language = 'en';
+		disaster = 'haze';
+		break;
+	  case 'kabutasap':
+		self.logger.info('Bot detected request keyword "kabutasap"');
+		language = 'id';
+		disaster = 'haze';
+		break;
+	  case 'volcano':
+		self.logger.info('Bot detected request keyword "volcano"');
+		language = 'en';
+		disaster = 'volcano';
+		break;
+	  case 'gunungapi':
+		self.logger.info('Bot detected request keyword "gunungapi"');
+		language = 'id';
+		disaster = 'volcano';
+		break;
+	  case 'extremewind':
+		self.logger.info('Bot detected request keyword "extremewind"');
+		language = 'en';
+		disaster = 'wind';
+		break;
+	  case 'anginkencang':
+		self.logger.info('Bot detected request keyword "anginkencang"');
+		language = 'id';
+		disaster = 'wind';
+		break;
 
-		case 'prep':
-			self.logger.info('Bot detected request keyword "prep"');
-			disaster = 'prep';
-			// self._getCardLink(username, self.config.twitter.network_name, language, 'prep', botTweet);
-			break;
-		}
-		if (addressed)
-			self._getCardLink(username, self.config.twitter.network_name, language, disaster, botTweet);
-		else
-			_sendStart(username, language, disaster, tweetActivity)
+	  case 'prep':
+		self.logger.info('Bot detected request keyword "prep"');
+		disaster = 'prep';
+		// self._getCardLink(username, self.config.twitter.network_name, language, 'prep', botTweet);
+		break;
+	}
+	if (addressed)
+		self._getCardLink(username, self.config.twitter.network_name, language, disaster, botTweet);
+	else
+		_sendStart(username, language, disaster, tweetActivity)
 	
 	}
 
@@ -515,9 +555,9 @@ PowertrackDataSource.prototype._getCardLink = function(username, network, langua
 	var self = this;
 
 	var card_request = {"username": username,
-      								"network": network,
-											"language": language
-										};
+						"network": network,
+						"language": language
+					};
 
   // Get a card from Cognicity server
   request({
