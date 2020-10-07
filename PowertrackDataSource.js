@@ -164,11 +164,11 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 
 	function parseRequest(tweetActivity, addressed){
 		var username = tweetActivity.user.screen_name;
-		var words = tweetActivity.body;
-    var filter = words.match(/baha|flood/gi);
-	var language = self._parseLangsFromActivity(tweetActivity)[0];
+		var words = tweetActivity.text;
+    var filter = words.match(/\bbaha\b|\bflood\b/gi);
+	var language = 'ph';
 	var disaster = 'default';
-    if (filter){filter = filter[0];}
+    if (filter){filter = filter[0].toLowerCase();}
 
     switch (filter){
       case null:
@@ -280,7 +280,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	var insideArea = false;
 	var addressed = false;
 
-	tweetActivity.gnip.matching_rules.forEach( function(rule){
+	tweetActivity.matching_rules.forEach( function(rule){
 		if (rule.tag) {
 			if (rule.tag.indexOf("addressed")===0) addressed = true;
 			self.config.gnip.areaTags.forEach( function(areaTag){
