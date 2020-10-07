@@ -508,7 +508,7 @@ PowertrackDataSource.prototype._sendReplyTweet = function(tweetActivity, media_i
  * @return {string} Tweet ID
  */
 PowertrackDataSource.prototype._parseTweetIdFromActivity = function(tweetActivity) {
-	return tweetActivity.id_str;
+	return tweetActivity.id.split(':')[2];
 };
 
 /**
