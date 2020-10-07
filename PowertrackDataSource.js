@@ -149,7 +149,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 		}
 		else {
 			// Set default media link
-			var media = self.config.twitter.media_id.id;
+			var media = self.config.twitter.media_id.ph;
 			// Get language of user's tweet
 			var lang = self._parseLangsFromActivity(tweetActivity)[0];
 			// Switch media to English if required
@@ -165,7 +165,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	function parseRequest(tweetActivity, addressed){
 		var username = tweetActivity.actor.preferredUsername;
 		var words = tweetActivity.body;
-    var filter = words.match(/banjir|flood|gempa|earthquake|prep/gi);
+    var filter = words.match(/baha|flood/gi);
 	var language = self._parseLangsFromActivity(tweetActivity)[0];
 	var disaster = 'default';
     if (filter){filter = filter[0];}
@@ -176,9 +176,9 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 		// self._ahoy(username, 'default' ,language, botTweet); //Respond with default
 		return;
 
-      case 'banjir':
-		self.logger.info('Bot detected request keyword "banjir"');
-		language = 'id';
+      case 'baha':
+		self.logger.info('Bot detected request keyword "baha"');
+		language = 'ph';
 		disaster = 'flood';
         // self._getCardLink(username, self.config.twitter.network_name, language, 'flood', botTweet);
 		break;
@@ -192,7 +192,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 
       case 'gempa':
 		self.logger.info('Bot detected request keyword "gempa"');
-		language = 'id';
+		language = 'ph';
 		disaster = 'earthquake';
         // self._getCardLink(username, self.config.twitter.network_name, language, 'earthquake', botTweet);
 		break;
@@ -210,7 +210,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 		break;
 	  case 'kebakaranhutan':
 		self.logger.info('Bot detected request keyword "kebakaranhutan"');
-		language = 'id';
+		language = 'ph';
 		disaster = 'fire';
 		break;
 	  case 'haze':
@@ -220,7 +220,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 		break;
 	  case 'kabutasap':
 		self.logger.info('Bot detected request keyword "kabutasap"');
-		language = 'id';
+		language = 'ph';
 		disaster = 'haze';
 		break;
 	  case 'volcano':
@@ -230,7 +230,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 		break;
 	  case 'gunungapi':
 		self.logger.info('Bot detected request keyword "gunungapi"');
-		language = 'id';
+		language = 'ph';
 		disaster = 'volcano';
 		break;
 	  case 'extremewind':
@@ -240,7 +240,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 		break;
 	  case 'anginkencang':
 		self.logger.info('Bot detected request keyword "anginkencang"');
-		language = 'id';
+		language = 'ph';
 		disaster = 'wind';
 		break;
 

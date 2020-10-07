@@ -47,15 +47,11 @@ config.gnip.username = process.env.GNIP_USERNAME; // Gnip username
 config.gnip.password = process.env.GNIP_PASSWORD; // Gnip password
 config.gnip.streamUrl = process.env.GNIP_STREAM_URL; // Gnip stream URL, take from the Gnip admin interface.
 config.gnip.rulesUrl = process.env.GNIP_RULES_URL; // Gnip rules URL, take from the Gnip admin interface.
-config.gnip.areaTags = [ 'jbd', 'bdg', 'sby', 'srg', 'id' ]; // Tags used in gnip rules to delineate areas
+config.gnip.areaTags = [ 'jbd', 'bdg', 'sby', 'srg', 'ph' ]; // Tags used in gnip rules to delineate areas
 // Gnip rules, enter as an object where the key is the rule name and the value is the rule as a string
 config.gnip.rules = {
-  "addressed": "(contains:flood OR contains:banjir OR contains:jakartabanjir OR contains:earthquake OR contains:gempa OR contains:forestfire or contains:kebakaranhutan or contains:haze or contains:kabutasap ot contains:extremewind or contains:anginkencang or contains:volcano or contains:gunungapi) @petabencana OR (contains:flood OR contains:banjir OR contains:jakartabanjir OR contains:earthquake OR contains:gempa) @petajkt",
-      "jbd":"( contains:flood OR contains:banjir OR contains:jakartabanjir ) ( bounding_box:[106.471 -6.19140 106.79381 -5.880] OR bounding_box:[106.79381 -6.19140 107.10880 -5.880] OR bounding_box:[107.10880 -6.19140 107.175 -5.880] OR bounding_box:[106.471 -6.50213 106.79381 -6.19140] OR bounding_box:[106.79381 -6.50213 107.10880 -6.19140] OR bounding_box:[107.10880 -6.50213 107.175 -6.19140] OR bounding_box:[106.471 -6.733 106.79381 -6.50213] OR bounding_box:[106.79381 -6.733 107.10880 -6.50213] OR bounding_box:[107.10880 -6.733 107.175 -6.50213] OR bio_location:jakarta OR place:jakarta)",
-      "bdg":"( contains:flood OR contains:banjir OR contains:bandungbanjir ) ( bounding_box:[107.369 -6.97964 107.68291 -6.668] OR bounding_box:[107.68921 -6.97964 107.931 -6.668] OR bounding_box:[107.369 -7.165 107.68921 -6.97964] OR bounding_box:[107.68291 -7.165 107.931 -6.97962] OR bio_location:bandung OR place:bandung)",
-      "sby":"( contains:flood OR contains:banjir OR contains:surabayabanjir ) ( bounding_box:[112.3975 -7.32570 112.71169 -7.0143] OR bounding_box:[112.71169 -7.32570 113.0318 -7.0143] OR bounding_box:[112.3975 -7.5499 112.71169 -7.32570] OR bounding_box:[112.71169 -7.5499 113.0318 -7.32570] OR bio_location:surabaya OR place:surabaya)",
-      "srg":"( contains:flood OR contains:banjir OR contains:semarangbanjir) ( bounding_box:[110.057 -7.03113 110.386 -6.72701] OR bounding_box:[110.386 -7.03113 110.715 -6.72701] OR bounding_box:[110.386 -7.33525 110.715 -7.03113] OR bounding_box:[110.057 -7.33525 110.386 -7.03113] OR bio_location:semarang OR place:semarang)",
-      "id":"( contains:flood OR contains:banjir OR contains:semarangbanjir OR contains:earthquake OR contains:gempa OR contains:forestfire or contains:kebakaranhutan or contains:haze or contains:kabutasap ot contains:extremewind or contains:anginkencang or contains:volcano or contains:gunungapi)  (bio_location:indonesia OR place:indonesia)"
+  "addressed": "(contains:flood OR contains:baha ) @mapakalamidad",
+  "ph":"( contains:flood OR contains:baha)  (bio_location:phillipines OR place:phillipines)"
 };
 
 config.gnip.maxReconnectTimeout = 1000 * 60 * 5; // In milliseconds; 5 minutes for max reconnection timeout - will mean ~10 minutes from first disconnection
@@ -80,7 +76,7 @@ config.twitter.url_length = 0; // URLs no longer count as part of tweet limits s
 // Note we use IN and ID because twitter and Gnip return different language codes for Indonesian
 // The messages should be no longer than 109 characters if timestamps are enabled, or 123 characters if timestamps are disabled
 // TODO - ADD SUPPORT FOR PREP CARD.
-config.twitter.defaultLanguage = 'id'; // The default language code to use if we can't resolve one from the tweet
+config.twitter.defaultLanguage = 'ph'; // The default language code to use if we can't resolve one from the tweet
 // Dialogue containers
 config.twitter.dialogue = {};
 config.twitter.dialogue.ahoy = {};          // Greet users
@@ -90,31 +86,14 @@ config.twitter.dialogue.ahoy.earthquake = {};          // Greet users
 config.twitter.dialogue.requests = {};      // Respond to user requests
 config.twitter.dialogue.requests.card = {};  // Flood report card responses
 // Dialogue translations
-config.twitter.dialogue.ahoy.default.en = 'Hi, I’m Disaster Bot. To report disaster near you, reply with #flood or #earthquake.';
-config.twitter.dialogue.ahoy.default.id =  'Halo, saya Bencana Bot. Untuk melaporkan bencana di sekitarmu, silakan balas dengan #banjir atau #gempa.';
-config.twitter.dialogue.ahoy.default.in = 'Halo, saya Bencana Bot. Untuk melaporkan bencana di sekitarmu, silakan balas dengan #banjir atau #gempa.';
+config.twitter.dialogue.ahoy.default.en = 'How are you? I’m Disaster Bot. To report flooding near you, reply using #flood.';
+config.twitter.dialogue.ahoy.default.ph =  'Kumusta ka? Ako si Kalamidad Bot. Upang maiulat ang pagbaha malapit sa iyong lugar, mag-reply gamit ang #baha.';
 
-config.twitter.dialogue.ahoy.flood.en = 'Hi, I’m Disaster Bot. To report flooding near you, reply with #flood.';
-config.twitter.dialogue.ahoy.flood.id =  'Halo, saya Bencana Bot. Untuk melaporkan banjir di sekitarmu, silakan balas dengan #banjir.';
+config.twitter.dialogue.ahoy.flood.en = 'How are you? I’m Disaster Bot. To report flooding near you, reply using #flood.';
+config.twitter.dialogue.ahoy.flood.ph =  'Kumusta ka? Ako si Kalamidad Bot. Upang maiulat ang pagbaha malapit sa iyong lugar, mag-reply gamit ang #baha.';
 
-config.twitter.dialogue.ahoy.earthquake.en = 'Hi, I’m Disaster Bot. To report earthquake impacts in your area, reply with #earthquake.';
-config.twitter.dialogue.ahoy.earthquake.id =  'Halo, saya Bencana Bot. Untuk melaporkan dampak gempa di sekitarmu, silakan balas dengan #gempa';
-
-config.twitter.dialogue.ahoy.volcano.en = 'Hi, I’m Disaster Bot. To report earthquake impacts in your area, reply with #earthquake.';
-config.twitter.dialogue.ahoy.volcano.id =  'Halo, saya Bencana Bot. Untuk melaporkan dampak gempa di sekitarmu, silakan balas dengan #gempa';
-
-config.twitter.dialogue.ahoy.fire.en = 'Hi, I’m Disaster Bot. To report earthquake impacts in your area, reply with #earthquake.';
-config.twitter.dialogue.ahoy.fire.id =  'Halo, saya Bencana Bot. Untuk melaporkan dampak gempa di sekitarmu, silakan balas dengan #gempa';
-
-config.twitter.dialogue.ahoy.haze.en = 'Hi, I’m Disaster Bot. To report earthquake impacts in your area, reply with #earthquake.';
-config.twitter.dialogue.ahoy.haze.id =  'Halo, saya Bencana Bot. Untuk melaporkan dampak gempa di sekitarmu, silakan balas dengan #gempa';
-
-config.twitter.dialogue.ahoy.wind.en = 'Hi, I’m Disaster Bot. To report earthquake impacts in your area, reply with #earthquake.';
-config.twitter.dialogue.ahoy.wind.id =  'Halo, saya Bencana Bot. Untuk melaporkan dampak gempa di sekitarmu, silakan balas dengan #gempa';
-
-config.twitter.dialogue.requests.card.en = 'Hi! Report the disaster in your area using this link. Thank you!';
-config.twitter.dialogue.requests.card.id = 'Hai! Laporkan bencana di sekitarmu menggunakan link ini. Terima kasih.';
-config.twitter.dialogue.requests.card.in = 'Hai! Gunakan link ini untuk menginput lokasi banjir, keterangan, & foto.';
+config.twitter.dialogue.requests.card.en = 'Hi! Please report the disaster in your area using this link. Thank you!';
+config.twitter.dialogue.requests.card.ph = 'Hi! Paki-ulat ang kalamidad sa iyong lugar gamit ang link na ito. Salamat!';
 
 // Append a timestamp to each sent tweet except response to confirmed reports with unique urls
 config.twitter.addTimestamp = false;
@@ -123,7 +102,7 @@ config.twitter.addTimestamp = false;
 // Add a specified twitter media to replies
 config.twitter.media_id = {};
 // See note above - GNIP uses 'in' to represent the Indonesian language.
-config.twitter.media_id.id = process.env.TWITTER_MEDIA_ID_ID;
+config.twitter.media_id.ph = process.env.TWITTER_MEDIA_ID_PH;
 config.twitter.media_id.en = process.env.TWITTER_MEDIA_ID_EN;
 // Name of network passed when a card is requested
 config.twitter.network_name = 'twitter';
