@@ -130,7 +130,7 @@ PowertrackDataSource.prototype._getlastTweetIDFromDatabase = function(callback) 
  * @param {GnipTweetActivity} tweetActivity The tweet activity from Gnip
  */
 PowertrackDataSource.prototype.filter = function(tweetActivity) {
-	var self = 
+	var self = this;
 	self.logger.verbose( 'filter: Received tweetActivity: screen_name="' + tweetActivity.actor.preferredUsername + '", text="' + tweetActivity.body.replace("\n", "") + '", coordinates="' + (tweetActivity.geo && tweetActivity.geo.coordinates ? tweetActivity.geo.coordinates[1]+", "+tweetActivity.geo.coordinates[0] : 'N/A') + '"' );
 
 	function botTweet(err, message) {
