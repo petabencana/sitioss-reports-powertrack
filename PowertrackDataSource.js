@@ -131,7 +131,7 @@ PowertrackDataSource.prototype._getlastTweetIDFromDatabase = function(callback) 
  */
 PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	var self = this;
-	self.logger.verbose( 'filter: Received tweetActivity: screen_name="' + tweetActivity.actor.preferredUsername + '", text="' + tweetActivity.body.replace("\n", "") + '", coordinates="' + (tweetActivity.geo && tweetActivity.geo.coordinates ? tweetActivity.geo.coordinates[1]+", "+tweetActivity.geo.coordinates[0] : 'N/A') + '"' );
+	self.logger.verbose( 'filter: Received tweetActivity: screen_name="' + tweetActivity.screen_name + '", text="' + tweetActivity.body.replace("\n", "") + '", coordinates="' + (tweetActivity.geo && tweetActivity.geo.coordinates ? tweetActivity.geo.coordinates[1]+", "+tweetActivity.geo.coordinates[0] : 'N/A') + '"' );
 
 	function botTweet(err, message) {
 		if (err){
@@ -163,7 +163,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	}
 
 	function parseRequest(tweetActivity, addressed){
-		var username = tweetActivity.actor.preferredUsername;
+		var username = tweetActivity.screen_name;
 		var words = tweetActivity.body;
     var filter = words.match(/baha|flood/gi);
 	var language = self._parseLangsFromActivity(tweetActivity)[0];
@@ -258,7 +258,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	}
 
 	function _sendStart(username, language, disaster, tweetActivity) {
-		self._ifNewUser(tweetActivity.actor.preferredUsername, function(username_hash){
+		self._ifNewUser(tweetActivity.screen_name, function(username_hash){
 			self._ahoy(username, disaster, language, botTweetWithMedia); //Respond with default
 			self._insertInvitee(tweetActivity);
 		});
@@ -266,10 +266,10 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	}
 
 	function sendAhoy(tweetActivity){
-		var username = tweetActivity.actor.preferredUsername;
+		var username = tweetActivity.screen_name;
 		var language = self._parseLangsFromActivity(tweetActivity)[0];
 
-		self._ifNewUser(tweetActivity.actor.preferredUsername, function(username_hash){
+		self._ifNewUser(tweetActivity.screen_name, function(username_hash){
 			self._ahoy(username, language, botTweetWithMedia); //Respond with default
 			self._insertInvitee(tweetActivity);
 		});
@@ -410,7 +410,7 @@ PowertrackDataSource.prototype.start = function() {
 
 			// Catch errors here, otherwise error in filter method is caught as stream error
 			try {
-				if (tweetActivity.actor) {
+				if (tweetActivity.screen_name) {
 					// This looks like a tweet in Gnip activity format, store ID, then check for filter
 					self._storeTweetID(tweetActivity, function(){
 						self._checkAgainstLastTweetID(tweetActivity, function(tweetActivity){
@@ -480,7 +480,7 @@ PowertrackDataSource.prototype.start = function() {
 PowertrackDataSource.prototype._insertInvitee = function(tweetActivity) {
 	var self = this;
 
-	self._baseInsertInvitee(tweetActivity.actor.preferredUsername);
+	self._baseInsertInvitee(tweetActivity.screen_name);
 };
 
 /**
@@ -494,7 +494,7 @@ PowertrackDataSource.prototype._sendReplyTweet = function(tweetActivity, media_i
 	var self = this;
 
 	self._baseSendReplyTweet(
-		tweetActivity.actor.preferredUsername,
+		tweetActivity.screen_name,
 		self._parseTweetIdFromActivity(tweetActivity),
 		media_id,
 		message,
