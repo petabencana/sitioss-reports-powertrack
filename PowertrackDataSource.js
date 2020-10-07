@@ -131,7 +131,7 @@ PowertrackDataSource.prototype._getlastTweetIDFromDatabase = function(callback) 
  */
 PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	var self = this;
-	self.logger.verbose( 'filter: Received tweetActivity: screen_name="' + tweetActivity.user.screen_name + '", text="' + tweetActivity.body.replace("\n", "") + '", coordinates="' + (tweetActivity.geo && tweetActivity.geo.coordinates ? tweetActivity.geo.coordinates[1]+", "+tweetActivity.geo.coordinates[0] : 'N/A') + '"' );
+	self.logger.verbose( 'filter: Received tweetActivity: screen_name="' + tweetActivity.user.screen_name + '", text="' + tweetActivity.text.replace("\n", ""));
 
 	function botTweet(err, message) {
 		if (err){
@@ -508,7 +508,7 @@ PowertrackDataSource.prototype._sendReplyTweet = function(tweetActivity, media_i
  * @return {string} Tweet ID
  */
 PowertrackDataSource.prototype._parseTweetIdFromActivity = function(tweetActivity) {
-	return tweetActivity.id.split(':')[2];
+	return tweetActivity.id_str;
 };
 
 /**
