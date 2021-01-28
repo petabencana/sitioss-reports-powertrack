@@ -168,7 +168,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
     var filter = words.match(/banjir|flood|gempa|earthquake|prep/gi);
 	var language = self._parseLangsFromActivity(tweetActivity)[0];
 	var disaster = 'default';
-    if (filter){filter = filter[0];}
+		if (filter) { filter = filter[0].toLowerCase();}
 
     switch (filter){
       case null:
