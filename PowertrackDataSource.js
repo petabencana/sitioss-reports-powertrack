@@ -280,7 +280,7 @@ PowertrackDataSource.prototype.filter = function(tweetActivity) {
 	var insideArea = false;
 	var addressed = false;
 
-	tweetActivity.matching_rules.forEach( function(rule){
+	tweetActivity.gnip.matching_rules.forEach( function(rule){
 		if (rule.tag) {
 			if (rule.tag.indexOf("addressed")===0) addressed = true;
 			self.config.gnip.areaTags.forEach( function(areaTag){
