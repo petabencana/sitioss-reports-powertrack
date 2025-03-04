@@ -1,19 +1,15 @@
-CogniCity
+Siti OSS
 ===========
-**Open Source GeoSocial Intelligence Framework**
+**Situaional Intelligence Open Source Framework**
 
-####cognicity-reports-powertrack: Module for [cognicity-reports](https://github.com/smart-facility/cognicity-reports) module to collect unconfirmed reports from Twitter via Gnip PowerTrack and send verification requests.
-
-Travis build status: [![Build Status](https://travis-ci.org/smart-facility/cognicity-reports-powertrack.svg?branch=master)](https://travis-ci.org/smart-facility/cognicity-reports-powertrack)
-
-DOI for current stable release [v2.0.0](https://github.com/smart-facility/cognicity-reports-powertrack/releases/tag/v2.0.0): [![DOI](https://zenodo.org/badge/19201/smart-facility/cognicity-reports-powertrack.svg)](https://zenodo.org/badge/latestdoi/19201/smart-facility/cognicity-reports-powertrack)
+####sitioss-reports-powertrack: Module for [sitioss-reports](https://github.com/petabencana/sitioss-reports) module to collect unconfirmed reports from Twitter via Gnip PowerTrack and send verification requests.
 
 ### About
-Cognicity-reports-powertrack is the NodeJS reports module for collecting relevant tweets via Gnip PowerTrack as part of the Cognicity Framework, and sending users verification messages via Twitter. For detailed framework documentation see [http://cognicity.info](http://cognicity.info).
-This module is not designed to be run standalone but is designed to be run as a submodule of [cognicity-reports](https://github.com/smart-facility/cognicity-reports), which can run just with this submodule alone.
+Sitioss-reports-powertrack is the NodeJS reports module for collecting relevant tweets via Gnip PowerTrack as part of the Siti OSS Framework, and sending users verification messages via Twitter. For detailed framework documentation see [http://sitioss.info](http://sitioss.info).
+This module is not designed to be run standalone but is designed to be run as a submodule of [sitioss-reports](https://github.com/petabencana/sitioss-reports), which can run just with this submodule alone.
 
 ### API Documentation
-[http://cognicity.info/cognicity/api-docs/cognicity-reports-powertrack/index.html](http://cognicity.info/cognicity/api-docs/cognicity-reports-powertrack/index.html)
+[https://docs.petabencana.id/master-1)
 
 ### Dependencies
 * [NodeJS](http://nodejs.org) version 4.2.1 or compatible
@@ -24,7 +20,7 @@ This module is not designed to be run standalone but is designed to be run as a 
 If you're going to commit changes to the JavaScript, be sure to run 'npm test' first - and fix any issues that it complains about, otherwise the build will fail when you push the commit.
 
 ### Installation
-Please install this as a submodule of [cognicity-reports](https://github.com/smart-facility/cognicity-reports). Please refer to the [documentation of that project](https://github.com/smart-facility/cognicity-reports/blob/master/README.md) for further information.
+Please install this as a submodule of [sitioss-reports](https://github.com/petabencana/sitioss-reports). 
 
 Install the node dependencies for this submodule as listed in package.json using npm: `npm install`
 
